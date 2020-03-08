@@ -1,1 +1,4 @@
 praw.ini
+*list*
+tickers*
+__pycache__
