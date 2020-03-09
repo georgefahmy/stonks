@@ -51,7 +51,7 @@ def get_arg_parser():
     )
     # TODO: Add --ignore flag and allow nargs of stock symbols to ignore
     arg_parser.add_argument(
-        "-i", "--ignore", nargs="*", help="List of stock symbols to ignore",
+        "-i", "--ignore", default=["DD", "RH"], nargs="*", help="List of stock symbols to ignore",
     )
     arg_parser.add_argument(
         "-d",
@@ -111,12 +111,17 @@ def check_ticker(caps_list, ignore_list):
     return ticker_list
 
 
-def print_top_count(wsb_ticker_list, frequency, count):
+def print_top_count(wsb_ticker_list, frequency, parsed):
 
-    top_three = frequency.most_common(count)
-    print("\nTop {} talked about stocks:".format(count))
+    top_three = frequency.most_common(parsed.print)
+    print(
+        "\nConfiguration: Sorting: {}, Submissions: {}, Comment depth: {} pages, Comment Score: {}".format(
+            str(parsed.type).capitalize(), parsed.submissions, parsed.comments, parsed.score
+        )
+    )
+    print("\nTop {} talked about stocks:".format(parsed.print))
 
-    for i in range(count):
+    for i in range(parsed.print):
         print(
             "[{}] - {}: {} occurances".format(
                 str(top_three[i][0]), str(wsb_ticker_list[top_three[i][0]]), str(top_three[i][1]),
@@ -181,44 +186,42 @@ def main(*args):
     handler.setFormatter(logging.Formatter(LOGGER_FORMAT, datefmt=DATE_FORMAT))
     logger.addHandler(handler)
 
-    try:
-        if str(parsed.type).lower() == "top":
-            logger.info("Top %d submissions:", parsed.submissions)
+    if str(parsed.type).lower() == "top":
+        logger.info("Top %d submissions:", parsed.submissions)
 
-            wall_street_bets = (
-                Reddit("wsb1", user_agent="extraction by /u/willfullytr")
-                .subreddit("wallstreetbets")
-                .top("day", limit=parsed.submissions)
-            )
+        wall_street_bets = (
+            Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+            .subreddit("wallstreetbets")
+            .top("day", limit=parsed.submissions)
+        )
 
-        elif str(parsed.type).lower() == "hot":
-            logger.info("Hot %d submissions:", parsed.submissions)
+    elif str(parsed.type).lower() == "hot":
+        logger.info("Hot %d submissions:", parsed.submissions)
 
-            wall_street_bets = (
-                Reddit("wsb1", user_agent="extraction by /u/willfullytr")
-                .subreddit("wallstreetbets")
-                .hot(limit=parsed.submissions)
-            )
+        wall_street_bets = (
+            Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+            .subreddit("wallstreetbets")
+            .hot(limit=parsed.submissions)
+        )
 
-        elif str(parsed.type).lower() == "new":
-            logger.info("%d new submissions:", parsed.submissions)
+    elif str(parsed.type).lower() == "new":
+        logger.info("%d new submissions:", parsed.submissions)
 
-            wall_street_bets = (
-                Reddit("wsb1", user_agent="extraction by /u/willfullytr")
-                .subreddit("wallstreetbets")
-                .new(limit=parsed.submissions)
-            )
+        wall_street_bets = (
+            Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+            .subreddit("wallstreetbets")
+            .new(limit=parsed.submissions)
+        )
 
-        wsb_ticker_list, frequency = find_stocks(wall_street_bets, parsed)
+    wsb_ticker_list, frequency = find_stocks(wall_street_bets, parsed)
 
-        print_top_count(wsb_ticker_list, frequency, parsed.print)
+    print_top_count(wsb_ticker_list, frequency, parsed)
 
-        if parsed.display_dict:
-            print("\nFull List of stocks found:")
-            pprint(wsb_ticker_list)
+    if parsed.display_dict:
+        print("\nFull List of stocks found:")
+        pprint(wsb_ticker_list)
 
-    except:
-        logger.warning("Invalid type selected")
+        # logger.warning("Invalid type selected")
 
 
 if __name__ == "__main__":
