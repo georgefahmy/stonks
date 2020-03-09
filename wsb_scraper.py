@@ -1,27 +1,70 @@
 import logging
+import os
 import re
+import sys
 
+from argparse import ArgumentParser
+from collections import Counter
 from praw import Reddit
 from pprint import pprint
 
 # Logger
 logger = logging.getLogger(__name__)
-
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 
-logger.setLevel(logging.DEBUG)
-handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter(LOGGER_FORMAT, datefmt=DATE_FORMAT))
-logger.addHandler(handler)
+
+# Arg Parser setup #
+def get_arg_parser():
+    """
+    Gets arguments for stock scraping.
+    """
+
+    arg_parser = ArgumentParser(description="Arguments for which stocks to scrape")
+
+    arg_parser.add_argument(
+        "submissions", help="Enter the number of submissions to scrape",
+    )
+    arg_parser.add_argument(
+        "-c",
+        "--comments",
+        default=None,
+        help="Enter the limit for how many comment pages to scrape. Default=None",
+    )
+    arg_parser.add_argument(
+        "-p",
+        "--print",
+        default=5,
+        help="Limit the number of stocks printed after scraping. Default=5",
+    )
+    arg_parser.add_argument(
+        "-s",
+        "--score",
+        default=20,
+        help="Minimum comment score to include in analysis. Default=20",
+    )
+    arg_parser.add_argument(
+        "-d",
+        "--display_dict",
+        default=False,
+        action="store_true",
+        help="Option to display dictionary of all stocks found. Default=False",
+    )
+
+    arg_parser.add_argument(
+        "--debug", default=False, action="store_true", help="Displays debug messages in console",
+    )
+
+    return arg_parser
 
 
-# Setup
-wall_street_bets = (
-    Reddit("wsb1", user_agent="extraction by /u/willfullytr")
-    .subreddit("wallstreetbets")
-    .top("day", limit=10)
-)
+def parse_args(args):
+    parser = get_arg_parser()
+
+    if not args:
+        args = sys.argv[1:]
+
+    return parser.parse_args(args)
 
 
 # Generate Tickers dictionary
@@ -50,14 +93,27 @@ def check_ticker(caps_list):
     ticker_list = []
     for word in caps_list:
         if word in symbols.keys():
-            logger.info("Valid stock symbol found: %s", word)
+            logger.debug("Valid stock symbol found: %s", word)
             ticker_list.append(word)
 
     return ticker_list
 
 
-def find_stocks():
+def print_top_count(wsb_ticker_list, frequency, count):
 
+    top_three = frequency.most_common(count)
+    print("\nTop {} talked about stocks:".format(count))
+
+    for i in range(count):
+        print(
+            "[{}] - {}: {} occurances".format(
+                str(top_three[i][0]), str(wsb_ticker_list[top_three[i][0]]), str(top_three[i][1]),
+            )
+        )
+
+
+def find_stocks(wall_street_bets, parsed):
+    count_list = []
     wsb_ticker_list = {}
     for submission in wall_street_bets:
         logger.info("New Submission: %s", submission.title)
@@ -68,24 +124,60 @@ def find_stocks():
             ticker_list = check_ticker(caps_list)
             if ticker_list:
                 for ticker in ticker_list:
+                    count_list.append(ticker)
                     wsb_ticker_list[ticker] = symbols[ticker]
 
-        submission.comments.replace_more(limit=20)
+        submission.comments.replace_more(int(parsed.comments))
+        comment_stocks = []
         for comment in submission.comments.list():
 
-            if comment.score > 20:
+            if comment.score > int(parsed.score):
                 body = comment.body
                 caps_list = scrape_for_caps(body)
                 if caps_list:
                     ticker_list = check_ticker(caps_list)
                     if ticker_list:
                         for ticker in ticker_list:
+                            comment_stocks.append(ticker)
+                            count_list.append(ticker)
                             wsb_ticker_list[ticker] = symbols[ticker]
 
-    logger.info("%d Stocks found", len(wsb_ticker_list))
+        logger.info("%d stocks found in comments", len(comment_stocks))
+
+    logger.info("Total number unique stocks: %d", len(wsb_ticker_list))
     logger.info("Done!")
-    return wsb_ticker_list
+
+    return wsb_ticker_list, Counter(count_list)
 
 
-wsb_ticker_list = find_stocks()
-pprint(wsb_ticker_list)
+def main(*args):
+
+    parsed = parse_args(args)
+
+    if parsed.debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter(LOGGER_FORMAT, datefmt=DATE_FORMAT))
+    logger.addHandler(handler)
+
+    # Setup
+    wall_street_bets = (
+        Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+        .subreddit("wallstreetbets")
+        .top("day", limit=int(parsed.submissions))
+    )
+
+    wsb_ticker_list, frequency = find_stocks(wall_street_bets, parsed)
+
+    print_top_count(wsb_ticker_list, frequency, int(parsed.print))
+
+    if parsed.display_dict:
+        print("\nFull List of stocks found:")
+        pprint(wsb_ticker_list)
+
+
+if __name__ == "__main__":
+    main()
