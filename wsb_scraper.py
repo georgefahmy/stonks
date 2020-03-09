@@ -23,25 +23,31 @@ def get_arg_parser():
     arg_parser = ArgumentParser(description="Arguments for which stocks to scrape")
 
     arg_parser.add_argument(
-        "submissions", help="Enter the number of submissions to scrape",
+        "type", help="Choose which submissions to search: top for the day, hot or new",
+    )
+    arg_parser.add_argument(
+        "--submissions", help="Enter the number of submissions to scrape", type=int,
     )
     arg_parser.add_argument(
         "-c",
         "--comments",
-        default=None,
+        default=100,
         help="Enter the limit for how many comment pages to scrape. Default=None",
+        type=int,
     )
     arg_parser.add_argument(
         "-p",
         "--print",
-        default=5,
+        default=3,
         help="Limit the number of stocks printed after scraping. Default=5",
+        type=int,
     )
     arg_parser.add_argument(
         "-s",
         "--score",
-        default=20,
+        default=5,
         help="Minimum comment score to include in analysis. Default=20",
+        type=int,
     )
     arg_parser.add_argument(
         "-d",
@@ -92,6 +98,8 @@ def scrape_for_caps(string):
 def check_ticker(caps_list):
     ticker_list = []
     for word in caps_list:
+        if word == "DD":
+            continue
         if word in symbols.keys():
             logger.debug("Valid stock symbol found: %s", word)
             ticker_list.append(word)
@@ -127,11 +135,16 @@ def find_stocks(wall_street_bets, parsed):
                     count_list.append(ticker)
                     wsb_ticker_list[ticker] = symbols[ticker]
 
-        submission.comments.replace_more(int(parsed.comments))
+        submission.comments.replace_more(limit=parsed.comments)
         comment_stocks = []
         for comment in submission.comments.list():
 
-            if comment.score > int(parsed.score):
+            logger.debug(comment.author)
+            if comment.author == "AutoModerator":
+                logger.debug("Skipping AutoModerator")
+                continue
+
+            if comment.score > parsed.score:
                 body = comment.body
                 caps_list = scrape_for_caps(body)
                 if caps_list:
@@ -163,20 +176,44 @@ def main(*args):
     handler.setFormatter(logging.Formatter(LOGGER_FORMAT, datefmt=DATE_FORMAT))
     logger.addHandler(handler)
 
-    # Setup
-    wall_street_bets = (
-        Reddit("wsb1", user_agent="extraction by /u/willfullytr")
-        .subreddit("wallstreetbets")
-        .top("day", limit=int(parsed.submissions))
-    )
+    try:
+        if str(parsed.type).lower() == "top":
+            logger.info("Top %d submissions:", parsed.submissions)
 
-    wsb_ticker_list, frequency = find_stocks(wall_street_bets, parsed)
+            wall_street_bets = (
+                Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+                .subreddit("wallstreetbets")
+                .top("day", limit=parsed.submissions)
+            )
 
-    print_top_count(wsb_ticker_list, frequency, int(parsed.print))
+        elif str(parsed.type).lower() == "hot":
+            logger.info("Hot %d submissions:", parsed.submissions)
 
-    if parsed.display_dict:
-        print("\nFull List of stocks found:")
-        pprint(wsb_ticker_list)
+            wall_street_bets = (
+                Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+                .subreddit("wallstreetbets")
+                .hot(limit=parsed.submissions)
+            )
+
+        elif str(parsed.type).lower() == "new":
+            logger.info("%d new submissions:", parsed.submissions)
+
+            wall_street_bets = (
+                Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+                .subreddit("wallstreetbets")
+                .new(limit=parsed.submissions)
+            )
+
+        wsb_ticker_list, frequency = find_stocks(wall_street_bets, parsed)
+
+        print_top_count(wsb_ticker_list, frequency, parsed.print)
+
+        if parsed.display_dict:
+            print("\nFull List of stocks found:")
+            pprint(wsb_ticker_list)
+
+    except:
+        logger.warning("Invalid type selected")
 
 
 if __name__ == "__main__":
