@@ -14,7 +14,8 @@ logger = logging.getLogger(__name__)
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 
-DEFAULT_IGNORE_LIST = ["DD", "RH", "USD", "ARE", "CL", "TD"]
+# DD is "Due Diligence", RH is "Robinhood", "WSB is wallstreetbets",
+DEFAULT_IGNORE_LIST = ["DD", "RH", "USD", "ARE", "CL", "TD", "WSB", "PM", "YOLO", "IPO", "SUB"]
 
 # Arg Parser setup #
 def get_arg_parser():
@@ -35,7 +36,7 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
-        "--submissions", help="Enter the number of submissions to scrape", type=int,
+        "--submissions", default=10, help="Enter the number of submissions to scrape", type=int,
     )
 
     arg_parser.add_argument(
@@ -63,11 +64,7 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
-        "-i",
-        "--ignore",
-        default=DEFAULT_IGNORE_LIST,
-        nargs="*",
-        help="List of stock symbols to ignore",
+        "-i", "--ignore", nargs="*", help="List of stock symbols to ignore",
     )
 
     arg_parser.add_argument(
@@ -102,7 +99,7 @@ for line in [line.rstrip("\n") for line in open("tickers.txt")]:
 
 # CAPS Scraper
 def scrape_for_caps(string):
-    REGEX_STRING = "(^[A-Z]+\s|[A-Z]+$|^[A-Z]+[\-][A-Z]?|^[A-Z]+[\.][A-Z]?)"
+    REGEX_STRING = "(^[A-Z]+\s|[A-Z]+$|^[A-Z]+[\-][A-Z]?|^[A-Z]+[\.][A-Z]?|^[$][A-Z]+)"
     words = re.findall("(\w+)", string)
     if words:
         caps_list = []
@@ -172,17 +169,23 @@ def get_sentiment(text):
 
 def find_stocks(wall_street_bets, parsed):
     count_list = []
-    ignore_list = DEFAULT_IGNORE_LIST.extend(parsed.ignore)
+    if parsed.ignore:
+        ignore_list = DEFAULT_IGNORE_LIST.extend(parsed.ignore)
+    else:
+        ignore_list = DEFAULT_IGNORE_LIST
+    logger.debug(ignore_list)
+
     wsb_ticker_list = {}
     for submission in wall_street_bets:
         logger.info("New Submission: %s", submission.title)
         logger.info("%d comments found", len(submission.comments.list()))
 
         caps_list = scrape_for_caps(submission.selftext)
-        print(get_sentiment(submission.selftext))
+
         if caps_list:
             ticker_list = check_ticker(caps_list, ignore_list)
             if ticker_list:
+                print(get_sentiment(submission.selftext))
                 for ticker in ticker_list:
                     count_list.append(ticker)
                     wsb_ticker_list[ticker] = symbols[ticker]
@@ -202,6 +205,7 @@ def find_stocks(wall_street_bets, parsed):
                 if caps_list:
                     ticker_list = check_ticker(caps_list, ignore_list)
                     if ticker_list:
+                        logger.debug(get_sentiment(comment.body))
                         for ticker in ticker_list:
                             comment_stocks.append(ticker)
                             count_list.append(ticker)
