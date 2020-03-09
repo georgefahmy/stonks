@@ -49,6 +49,10 @@ def get_arg_parser():
         help="Minimum comment score to include in analysis. Default=20",
         type=int,
     )
+    # TODO: Add --ignore flag and allow nargs of stock symbols to ignore
+    arg_parser.add_argument(
+        "-i", "--ignore", nargs="*", help="List of stock symbols to ignore",
+    )
     arg_parser.add_argument(
         "-d",
         "--display_dict",
@@ -95,10 +99,10 @@ def scrape_for_caps(string):
         return caps_list
 
 
-def check_ticker(caps_list):
+def check_ticker(caps_list, ignore_list):
     ticker_list = []
     for word in caps_list:
-        if word == "DD":
+        if word in ignore_list:
             continue
         if word in symbols.keys():
             logger.debug("Valid stock symbol found: %s", word)
@@ -122,6 +126,7 @@ def print_top_count(wsb_ticker_list, frequency, count):
 
 def find_stocks(wall_street_bets, parsed):
     count_list = []
+    ignore_list = parsed.ignore
     wsb_ticker_list = {}
     for submission in wall_street_bets:
         logger.info("New Submission: %s", submission.title)
@@ -129,7 +134,7 @@ def find_stocks(wall_street_bets, parsed):
 
         caps_list = scrape_for_caps(submission.selftext)
         if caps_list:
-            ticker_list = check_ticker(caps_list)
+            ticker_list = check_ticker(caps_list, ignore_list)
             if ticker_list:
                 for ticker in ticker_list:
                     count_list.append(ticker)
@@ -148,7 +153,7 @@ def find_stocks(wall_street_bets, parsed):
                 body = comment.body
                 caps_list = scrape_for_caps(body)
                 if caps_list:
-                    ticker_list = check_ticker(caps_list)
+                    ticker_list = check_ticker(caps_list, ignore_list)
                     if ticker_list:
                         for ticker in ticker_list:
                             comment_stocks.append(ticker)
