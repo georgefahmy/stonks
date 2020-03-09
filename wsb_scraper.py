@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 
-DEFAULT_IGNORE_LIST = ["DD", "RH", "USD", "ARE"]
+DEFAULT_IGNORE_LIST = ["DD", "RH", "USD", "ARE", "CL", "TD"]
 
 # Arg Parser setup #
 def get_arg_parser():
@@ -130,9 +130,18 @@ def check_ticker(caps_list, ignore_list):
 def print_top_count(wsb_ticker_list, frequency, parsed):
 
     top_stocks = frequency.most_common(parsed.print)
+    if parsed.type == "day":
+        top_string = " for the {},".format(str(parsed.type_flag).lower())
+    else:
+        top_string = ""
+
     print(
-        "\nConfiguration: Sorting {} {} submissions with comment depth of {} pages. Minimum comment ccore: {}".format(
-            parsed.submissions, str(parsed.type).capitalize(), parsed.comments, parsed.score
+        "\nConfiguration: Sorting {} {} submissions{} with comment depth of {} pages. Minimum comment ccore: {}".format(
+            parsed.submissions,
+            str(parsed.type).capitalize(),
+            top_string,
+            parsed.comments,
+            parsed.score,
         )
     )
     print("\nTop {} talked about stocks:".format(parsed.print))
@@ -205,7 +214,7 @@ def main(*args):
     logger.addHandler(handler)
 
     if str(parsed.type).lower() == "top":
-        logger.info("Top %d submissions:", parsed.submissions)
+        logger.info("Top %d submissions for the %s:", parsed.submissions, parsed.type_flag)
 
         wall_street_bets = (
             Reddit("wsb1", user_agent="extraction by /u/willfullytr")
