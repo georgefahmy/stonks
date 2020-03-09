@@ -12,8 +12,20 @@ logger = logging.getLogger(__name__)
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 # DD is "Due Diligence", RH is "Robinhood", "WSB is wallstreetbets",
-DEFAULT_IGNORE_LIST = ["DD", "RH", "USD", "ARE", "CL", "TD", "WSB", "PM", "YOLO", "IPO", "SUB"]
-
+DEFAULT_IGNORE_LIST = [
+    "DD",
+    "RH",
+    "USD",
+    "ARE",
+    "CL",
+    "TD",
+    "WSB",
+    "PM",
+    "YOLO",
+    "IPO",
+    "SUB",
+    "EOD",
+]
 
 logger.setLevel(logging.INFO)
 handler = logging.StreamHandler()
