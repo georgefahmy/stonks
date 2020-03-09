@@ -4,6 +4,7 @@ cycler==0.10.0
 idna==2.9
 kiwisolver==1.1.0
 matplotlib==3.2.0
+nltk==3.4.5
 numpy==1.18.1
 pandas==1.0.1
 praw==6.5.1
@@ -15,6 +16,7 @@ pytz==2019.3
 requests==2.23.0
 robin-stocks==0.9.9.6
 six==1.14.0
+textblob==0.15.3
 update-checker==0.16
 urllib3==1.25.8
 websocket-client==0.57.0
