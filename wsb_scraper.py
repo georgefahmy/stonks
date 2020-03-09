@@ -7,6 +7,7 @@ from argparse import ArgumentParser
 from collections import Counter
 from praw import Reddit
 from pprint import pprint
+from textblob import TextBlob
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -156,15 +157,29 @@ def print_top_count(wsb_ticker_list, frequency, parsed):
         )
 
 
+def get_sentiment(text):
+    clean_text = " ".join(
+        re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", text).split()
+    )
+    analysis = TextBlob(clean_text)
+    if analysis.sentiment.polarity > 0:
+        return "positive"
+    elif analysis.sentiment.polarity == 0:
+        return "neutral"
+    else:
+        return "negative"
+
+
 def find_stocks(wall_street_bets, parsed):
     count_list = []
-    ignore_list = parsed.ignore
+    ignore_list = DEFAULT_IGNORE_LIST.extend(parsed.ignore)
     wsb_ticker_list = {}
     for submission in wall_street_bets:
         logger.info("New Submission: %s", submission.title)
         logger.info("%d comments found", len(submission.comments.list()))
 
         caps_list = scrape_for_caps(submission.selftext)
+        print(get_sentiment(submission.selftext))
         if caps_list:
             ticker_list = check_ticker(caps_list, ignore_list)
             if ticker_list:
@@ -182,8 +197,8 @@ def find_stocks(wall_street_bets, parsed):
                 continue
 
             if comment.score > parsed.score:
-                body = comment.body
-                caps_list = scrape_for_caps(body)
+
+                caps_list = scrape_for_caps(comment.body)
                 if caps_list:
                     ticker_list = check_ticker(caps_list, ignore_list)
                     if ticker_list:
