@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 
+DEFAULT_IGNORE_LIST = ["DD", "RH", "USD", "ARE"]
 
 # Arg Parser setup #
 def get_arg_parser():
@@ -25,9 +26,17 @@ def get_arg_parser():
     arg_parser.add_argument(
         "type", help="Choose which submissions to search: top for the day, hot or new",
     )
+
+    arg_parser.add_argument(
+        "--type-flag",
+        default="day",
+        help="enter the type of sorting for 'Top': 'day, week, month'",
+    )
+
     arg_parser.add_argument(
         "--submissions", help="Enter the number of submissions to scrape", type=int,
     )
+
     arg_parser.add_argument(
         "-c",
         "--comments",
@@ -35,6 +44,7 @@ def get_arg_parser():
         help="Enter the limit for how many comment pages to scrape. Default=None",
         type=int,
     )
+
     arg_parser.add_argument(
         "-p",
         "--print",
@@ -42,6 +52,7 @@ def get_arg_parser():
         help="Limit the number of stocks printed after scraping. Default=5",
         type=int,
     )
+
     arg_parser.add_argument(
         "-s",
         "--score",
@@ -49,10 +60,15 @@ def get_arg_parser():
         help="Minimum comment score to include in analysis. Default=20",
         type=int,
     )
-    # TODO: Add --ignore flag and allow nargs of stock symbols to ignore
+
     arg_parser.add_argument(
-        "-i", "--ignore", default=["DD", "RH"], nargs="*", help="List of stock symbols to ignore",
+        "-i",
+        "--ignore",
+        default=DEFAULT_IGNORE_LIST,
+        nargs="*",
+        help="List of stock symbols to ignore",
     )
+
     arg_parser.add_argument(
         "-d",
         "--display_dict",
@@ -113,10 +129,10 @@ def check_ticker(caps_list, ignore_list):
 
 def print_top_count(wsb_ticker_list, frequency, parsed):
 
-    top_three = frequency.most_common(parsed.print)
+    top_stocks = frequency.most_common(parsed.print)
     print(
-        "\nConfiguration: Sorting: {}, Submissions: {}, Comment depth: {} pages, Comment Score: {}".format(
-            str(parsed.type).capitalize(), parsed.submissions, parsed.comments, parsed.score
+        "\nConfiguration: Sorting {} {} submissions with comment depth of {} pages. Minimum comment ccore: {}".format(
+            parsed.submissions, str(parsed.type).capitalize(), parsed.comments, parsed.score
         )
     )
     print("\nTop {} talked about stocks:".format(parsed.print))
@@ -124,7 +140,9 @@ def print_top_count(wsb_ticker_list, frequency, parsed):
     for i in range(parsed.print):
         print(
             "[{}] - {}: {} occurances".format(
-                str(top_three[i][0]), str(wsb_ticker_list[top_three[i][0]]), str(top_three[i][1]),
+                str(top_stocks[i][0]),
+                str(wsb_ticker_list[top_stocks[i][0]]),
+                str(top_stocks[i][1]),
             )
         )
 
@@ -192,7 +210,7 @@ def main(*args):
         wall_street_bets = (
             Reddit("wsb1", user_agent="extraction by /u/willfullytr")
             .subreddit("wallstreetbets")
-            .top("day", limit=parsed.submissions)
+            .top(str(parsed.type_flag).lower(), limit=parsed.submissions)
         )
 
     elif str(parsed.type).lower() == "hot":
