@@ -147,7 +147,7 @@ def print_top_count(wsb_ticker_list, frequency, parsed):
         top_string = ""
 
     print(
-        "\nConfiguration: Sorting {} {} submissions{} with comment depth of {} pages. Minimum comment ccore: {}".format(
+        "\nConfiguration: Sorting {} {} submissions{} with comment depth of {} pages. Minimum comment score: {}".format(
             parsed.submissions,
             str(parsed.type).capitalize(),
             top_string,
@@ -198,7 +198,6 @@ def find_stocks(wall_street_bets, parsed):
         if caps_list:
             ticker_list = check_ticker(caps_list, ignore_list)
             if ticker_list:
-                print(get_sentiment(submission.selftext))
                 for ticker in ticker_list:
                     count_list.append(ticker)
                     wsb_ticker_list[ticker] = symbols[ticker]

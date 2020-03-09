@@ -4,6 +4,7 @@ import re
 
 from praw import Reddit
 from pprint import pprint
+from textblob import TextBlob
 
 
 # Logger
@@ -39,6 +40,19 @@ stream = (
     .subreddit("wallstreetbets")
     .stream.comments()
 )
+
+
+def get_sentiment(text):
+    clean_text = " ".join(
+        re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", text).split()
+    )
+    analysis = TextBlob(clean_text)
+    if analysis.sentiment.polarity > 0:
+        return "positive"
+    elif analysis.sentiment.polarity == 0:
+        return "neutral"
+    else:
+        return "negative"
 
 
 def check_ticker(caps_list, ignore_list):
@@ -87,3 +101,4 @@ for comment in stream:
             print("Stocks Found:")
             for ticker in ticker_list:
                 print(ticker)
+            print("\nSentiment:\n{}\n".format(get_sentiment(comment.body)))
