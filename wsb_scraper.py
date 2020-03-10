@@ -189,9 +189,10 @@ def find_stocks(wall_street_bets, parsed):
     logger.debug(ignore_list)
 
     wsb_ticker_list = {}
+    filtered_comments = 0
     for submission in wall_street_bets:
         logger.info("New Submission: %s", submission.title)
-        logger.info("%d comments found", len(submission.comments.list()))
+        logger.info("%d total comments found", len(submission.comments.list()))
 
         caps_list = scrape_for_caps(submission.selftext)
 
@@ -212,7 +213,7 @@ def find_stocks(wall_street_bets, parsed):
                 continue
 
             if comment.score > parsed.score:
-
+                filtered_comments += 1
                 caps_list = scrape_for_caps(comment.body)
                 if caps_list:
                     ticker_list = check_ticker(caps_list, ignore_list)
@@ -222,11 +223,11 @@ def find_stocks(wall_street_bets, parsed):
                             comment_stocks.append(ticker)
                             count_list.append(ticker)
                             wsb_ticker_list[ticker] = symbols[ticker]
+        logger.info("comments above score threshold: %d", filtered_comments)
+        logger.info("stocks found in comments: %d", len(comment_stocks))
 
-        logger.info("%d stocks found in comments", len(comment_stocks))
-
-    logger.info("Total number unique stocks: %d", len(wsb_ticker_list))
     logger.info("Done!")
+    logger.info("Total number unique stocks: %d", len(wsb_ticker_list))
 
     return wsb_ticker_list, Counter(count_list)
 
