@@ -189,7 +189,7 @@ def find_stocks(wall_street_bets, parsed):
     logger.debug(ignore_list)
 
     wsb_ticker_list = {}
-    filtered_comments = 0
+
     for submission in wall_street_bets:
         logger.info("New Submission: %s", submission.title)
         logger.info("%d total comments found", len(submission.comments.list()))
@@ -206,7 +206,7 @@ def find_stocks(wall_street_bets, parsed):
         submission.comments.replace_more(limit=parsed.comments)
         comment_stocks = []
         for comment in submission.comments.list():
-
+            filtered_comments = 0
             logger.debug(comment.author)
             if comment.author == "AutoModerator":
                 logger.debug("Skipping AutoModerator")
@@ -223,8 +223,8 @@ def find_stocks(wall_street_bets, parsed):
                             comment_stocks.append(ticker)
                             count_list.append(ticker)
                             wsb_ticker_list[ticker] = symbols[ticker]
-        logger.info("comments above score threshold: %d", filtered_comments)
-        logger.info("stocks found in comments: %d", len(comment_stocks))
+        logger.info("Comments above score threshold: %d", filtered_comments)
+        logger.info("Stocks found in comments: %d", len(comment_stocks))
 
     logger.info("Done!")
     logger.info("Total number unique stocks: %d", len(wsb_ticker_list))
