@@ -8,6 +8,7 @@ from collections import Counter
 from praw import Reddit
 from pprint import pprint
 from textblob import TextBlob
+from utils.ignore import DEFAULT_IGNORE_LIST
 
 # Logger
 logger = logging.getLogger(__name__)
@@ -28,6 +29,7 @@ DEFAULT_IGNORE_LIST = [
     "IPO",
     "SUB",
     "EOD",
+    "CDC",
 ]
 
 # Arg Parser setup #
