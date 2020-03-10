@@ -100,5 +100,5 @@ for comment in stream:
             )
             print("Stocks Found:")
             for ticker in ticker_list:
-                print(ticker)
+                print("[{}] {}".format(ticker, symbols[ticker]))
             print("\nSentiment:\n{}\n".format(get_sentiment(comment.body)))
