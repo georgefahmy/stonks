@@ -17,4 +17,5 @@ DEFAULT_IGNORE_LIST = [
     "IT",
     "ON",
     "GO",
+    "USA",
 ]
