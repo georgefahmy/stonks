@@ -89,3 +89,5 @@ for comment in stream:
             for ticker in list(set(ticker_list)):
                 print("[{}] {}".format(ticker, symbols[ticker]))
             print("\n")
+
+# TODO add the current price for the stocks being talked about. use the Robinhood API or some other API
