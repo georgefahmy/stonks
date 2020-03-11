@@ -13,16 +13,19 @@ Description: Reddit WallStreetBets stream with stock extraction from comments. I
 
 
 # Base Python #
-import datetime
 import logging
 import os
+import pytz
 import re
 import sys
+
+
+from datetime import datetime
+from pprint import pprint
 
 # Extended Python #
 from argparse import ArgumentParser
 from praw import Reddit
-from pprint import pprint
 from textblob import TextBlob
 from utils.ignore import DEFAULT_IGNORE_LIST
 
@@ -52,7 +55,7 @@ def get_arg_parser():
         "--link",
         action="store_true",
         default=False,
-        help="optional flag to display comment permalink in the stream.",
+        help="optional flag to display comment permalink in the stream. Default=False",
     )
 
     arg_parser.add_argument(
@@ -60,7 +63,7 @@ def get_arg_parser():
         "--sentiment",
         action="store_true",
         default=False,
-        help="Optional flag to display comment sentiment (experimental)",
+        help="Optional flag to display comment sentiment (experimental). Default=False",
     )
 
     arg_parser.add_argument(
@@ -77,15 +80,6 @@ def parse_args(args):
         args = sys.argv[1:]
 
     return parser.parse_args(args)
-
-
-# Stream Setup
-logger.info("Getting WallStreetBets comments stream...")
-stream = (
-    Reddit("wsb1", user_agent="extraction by /u/willfullytr")
-    .subreddit("wallstreetbets")
-    .stream.comments()
-)
 
 
 def get_sentiment(text):
@@ -141,34 +135,41 @@ def main(*args):
     handler.setFormatter(logging.Formatter(LOGGER_FORMAT, datefmt=DATE_FORMAT))
     logger.addHandler(handler)
 
+    # Stream Setup
+    logger.info("Getting WallStreetBets comments stream...")
+    stream = (
+        Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+        .subreddit("wallstreetbets")
+        .stream.comments(skip_existing=True)
+    )
+
     logger.info("Starting stream!")
+
     for comment in stream:
 
         caps_list = scrape_for_caps(comment.body)
         if caps_list:
             ticker_list = check_ticker(caps_list, DEFAULT_IGNORE_LIST)
             if ticker_list:
+
                 print(
-                    "-----{}-----\n[{}] {}: {}".format(
-                        comment.submission.title,
-                        datetime.datetime.now(),
-                        comment.author,
-                        comment.body,
+                    "\n-----{}-----\n[{}] {}: {}\n".format(
+                        comment.submission.title, datetime.now(), comment.author, comment.body,
                     )
                 )
                 if parsed.link:
                     comment_link = "www.reddit.com" + comment.permalink
-                    print("\n{}\n".format(comment_link))
+                    print("URL: {}\n".format(comment_link))
 
                 if parsed.sentiment:
-                    print("\nSentiment:\n{}\n".format(get_sentiment(comment.body)))
+                    print("Sentiment:\n{}\n".format(get_sentiment(comment.body)))
 
                 print("Stocks Found:")
                 for ticker in list(set(ticker_list)):
                     print("[{}] {}".format(ticker, symbols[ticker]))
-                print("\n")
 
     # TODO add the current price for the stocks being talked about. use the Robinhood API or some other API
+    # TODO add a check for puts or calls (p, c) in the comment to help with sentiment.
 
 
 if __name__ == "__main__":
