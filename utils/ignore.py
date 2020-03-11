@@ -18,4 +18,11 @@ DEFAULT_IGNORE_LIST = [
     "ON",
     "GO",
     "USA",
+    "AM",
+    "PDT",
+    "BUY",
+    "LOW",
+    "PUMP",
+    "CAN",
+    "CASH",
 ]
