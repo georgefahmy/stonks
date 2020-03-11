@@ -1,7 +1,26 @@
+"""
+streamer.py
+
+Date Created: March 9th, 2020
+
+Author: gfahmy gfahmy@zoox.com
+
+Description: Reddit WallStreetBets stream with stock extraction from comments. Includes comment
+    sentiment as well as links to the comment URL. Stock symbol extraction can also be used to
+    automate retrieving stock price information.
+
+"""
+
+
+# Base Python #
 import datetime
 import logging
+import os
 import re
+import sys
 
+# Extended Python #
+from argparse import ArgumentParser
 from praw import Reddit
 from pprint import pprint
 from textblob import TextBlob
@@ -14,10 +33,50 @@ logger = logging.getLogger(__name__)
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 
-logger.setLevel(logging.INFO)
-handler = logging.StreamHandler()
-handler.setFormatter(logging.Formatter(LOGGER_FORMAT, datefmt=DATE_FORMAT))
-logger.addHandler(handler)
+# Generate Tickers dictionary
+logger.info("generating Symbols list")
+symbols = {}
+for line in [line.rstrip("\n") for line in open("tickers.txt")]:
+    symbols[line.split("|")[0]] = line.split("|")[1]
+
+
+def get_arg_parser():
+    """
+    Gets arguments for stock scraping.
+    """
+
+    arg_parser = ArgumentParser(description="Arguments for which stocks to scrape")
+
+    arg_parser.add_argument(
+        "-l",
+        "--link",
+        action="store_true",
+        default=False,
+        help="optional flag to display comment permalink in the stream.",
+    )
+
+    arg_parser.add_argument(
+        "-s",
+        "--sentiment",
+        action="store_true",
+        default=False,
+        help="Optional flag to display comment sentiment (experimental)",
+    )
+
+    arg_parser.add_argument(
+        "--debug", default=False, action="store_true", help="Displays debug messages in console",
+    )
+
+    return arg_parser
+
+
+def parse_args(args):
+    parser = get_arg_parser()
+
+    if not args:
+        args = sys.argv[1:]
+
+    return parser.parse_args(args)
 
 
 # Stream Setup
@@ -69,28 +128,48 @@ def scrape_for_caps(string):
         return caps_list
 
 
-# Generate Tickers dictionary
-logger.info("generating Symbols list")
-symbols = {}
-for line in [line.rstrip("\n") for line in open("tickers.txt")]:
-    symbols[line.split("|")[0]] = line.split("|")[1]
+def main(*args):
 
-logger.info("Starting stream!")
-for comment in stream:
+    parsed = parse_args(args)
 
-    caps_list = scrape_for_caps(comment.body)
-    if caps_list:
-        ticker_list = check_ticker(caps_list, DEFAULT_IGNORE_LIST)
-        if ticker_list:
-            print(
-                "-----{}-----\n[{}] {}: {}".format(
-                    comment.submission.title, datetime.datetime.now(), comment.author, comment.body
+    if parsed.debug:
+        logger.setLevel(logging.DEBUG)
+    else:
+        logger.setLevel(logging.INFO)
+
+    handler = logging.StreamHandler()
+    handler.setFormatter(logging.Formatter(LOGGER_FORMAT, datefmt=DATE_FORMAT))
+    logger.addHandler(handler)
+
+    logger.info("Starting stream!")
+    for comment in stream:
+
+        caps_list = scrape_for_caps(comment.body)
+        if caps_list:
+            ticker_list = check_ticker(caps_list, DEFAULT_IGNORE_LIST)
+            if ticker_list:
+                print(
+                    "-----{}-----\n[{}] {}: {}".format(
+                        comment.submission.title,
+                        datetime.datetime.now(),
+                        comment.author,
+                        comment.body,
+                    )
                 )
-            )
-            print("\nSentiment:\n{}\n".format(get_sentiment(comment.body)))
-            print("Stocks Found:")
-            for ticker in list(set(ticker_list)):
-                print("[{}] {}".format(ticker, symbols[ticker]))
-            print("\n")
+                if parsed.link:
+                    comment_link = "www.reddit.com" + comment.permalink
+                    print("\n{}\n".format(comment_link))
 
-# TODO add the current price for the stocks being talked about. use the Robinhood API or some other API
+                if parsed.sentiment:
+                    print("\nSentiment:\n{}\n".format(get_sentiment(comment.body)))
+
+                print("Stocks Found:")
+                for ticker in list(set(ticker_list)):
+                    print("[{}] {}".format(ticker, symbols[ticker]))
+                print("\n")
+
+    # TODO add the current price for the stocks being talked about. use the Robinhood API or some other API
+
+
+if __name__ == "__main__":
+    main()
