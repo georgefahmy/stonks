@@ -11,4 +11,10 @@ DEFAULT_IGNORE_LIST = [
     "IPO",
     "SUB",
     "EOD",
+    "TV",
+    "AT",
+    "NEW",
+    "IT",
+    "ON",
+    "GO",
 ]

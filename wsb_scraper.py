@@ -16,21 +16,6 @@ LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 
 # DD is "Due Diligence", RH is "Robinhood", "WSB is wallstreetbets",
-DEFAULT_IGNORE_LIST = [
-    "DD",
-    "RH",
-    "USD",
-    "ARE",
-    "CL",
-    "TD",
-    "WSB",
-    "PM",
-    "YOLO",
-    "IPO",
-    "SUB",
-    "EOD",
-    "CDC",
-]
 
 # Arg Parser setup #
 def get_arg_parser():
@@ -207,8 +192,8 @@ def find_stocks(wall_street_bets, parsed):
 
         submission.comments.replace_more(limit=parsed.comments)
         comment_stocks = []
+        filtered_comments = 0
         for comment in submission.comments.list():
-            filtered_comments = 0
             logger.debug(comment.author)
             if comment.author == "AutoModerator":
                 logger.debug("Skipping AutoModerator")

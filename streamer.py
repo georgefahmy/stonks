@@ -84,7 +84,8 @@ for comment in stream:
                     comment.submission.title, datetime.datetime.now(), comment.author, comment.body
                 )
             )
-            print("Stocks Found:")
-            for ticker in ticker_list:
-                print("[{}] {}".format(ticker, symbols[ticker]))
             print("\nSentiment:\n{}\n".format(get_sentiment(comment.body)))
+            print("Stocks Found:")
+            for ticker in list(set(ticker_list)):
+                print("[{}] {}".format(ticker, symbols[ticker]))
+            print("\n")
