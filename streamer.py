@@ -21,6 +21,7 @@ logger.addHandler(handler)
 
 
 # Stream Setup
+logger.info("Getting WallStreetBets comments stream...")
 stream = (
     Reddit("wsb1", user_agent="extraction by /u/willfullytr")
     .subreddit("wallstreetbets")
@@ -69,10 +70,12 @@ def scrape_for_caps(string):
 
 
 # Generate Tickers dictionary
+logger.info("generating Symbols list")
 symbols = {}
 for line in [line.rstrip("\n") for line in open("tickers.txt")]:
     symbols[line.split("|")[0]] = line.split("|")[1]
 
+logger.info("Starting stream!")
 for comment in stream:
 
     caps_list = scrape_for_caps(comment.body)
