@@ -25,4 +25,5 @@ DEFAULT_IGNORE_LIST = [
     "PUMP",
     "CAN",
     "CASH",
+    "CDC",
 ]
