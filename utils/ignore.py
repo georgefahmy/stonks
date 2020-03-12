@@ -26,4 +26,6 @@ DEFAULT_IGNORE_LIST = [
     "CAN",
     "CASH",
     "CDC",
+    "ALL",
+    "JUST",
 ]
