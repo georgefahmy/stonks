@@ -30,4 +30,8 @@ DEFAULT_IGNORE_LIST = [
     "JUST",
     "SO",
     "IRS",
+    "FOR",
+    "ELSE",
+    "EDIT",
+    "ATH",
 ]

@@ -48,7 +48,11 @@ def get_arg_parser():
     Gets arguments for stock scraping.
     """
 
-    arg_parser = ArgumentParser(description="Arguments for which stocks to scrape")
+    arg_parser = ArgumentParser(
+        description="""Reddit WallStreetBets stream with stock extraction
+        from comments. Includes comment sentiment as well as links to the comment URL. Stock symbol
+        extraction can also be used to automate retrieving stock price information."""
+    )
 
     arg_parser.add_argument(
         "-l",
