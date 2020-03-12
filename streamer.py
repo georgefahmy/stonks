@@ -3,7 +3,7 @@ streamer.py
 
 Date Created: March 9th, 2020
 
-Author: gfahmy gfahmy@zoox.com
+Author: georgefahmy
 
 Description: Reddit WallStreetBets stream with stock extraction from comments. Includes comment
     sentiment as well as links to the comment URL. Stock symbol extraction can also be used to
@@ -142,6 +142,12 @@ def main(*args):
         .subreddit("wallstreetbets")
         .stream.comments(skip_existing=True)
     )
+
+    if parsed.link:
+        logger.info("link flag set: will provide links in printout")
+
+    if parsed.sentiment:
+        logger.info("Sentiment flag set: comment sentiment will be interpreted (experimental)")
 
     logger.info("Starting stream!")
 
