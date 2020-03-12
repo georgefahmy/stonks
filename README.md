@@ -3,6 +3,8 @@
 
 Best to run this in a virtual environment to keep things clean.
 
+`git clone https://github.com/georgefahmy/stonks.git`
+
 `pip install -r requirements.txt`
 
 Run `python nltk_download.py` and download 'corpora'.
