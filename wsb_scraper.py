@@ -1,3 +1,17 @@
+"""
+wsb_scraper.py
+
+Date Created: March 9th, 2020
+
+Author: georgefahmy
+
+Description: Generate a report for stock mentions and the number of occurrences in
+    /r/wallstreetbets. Options allow for different types of filters and thresholds.
+
+"""
+
+
+# Base Python #
 import logging
 import os
 import re
@@ -5,6 +19,8 @@ import sys
 
 from argparse import ArgumentParser
 from collections import Counter
+
+# Extended Python #
 from praw import Reddit
 from pprint import pprint
 from textblob import TextBlob
@@ -15,15 +31,14 @@ logger = logging.getLogger(__name__)
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 
-# DD is "Due Diligence", RH is "Robinhood", "WSB is wallstreetbets",
-
 # Arg Parser setup #
 def get_arg_parser():
     """
-    Gets arguments for stock scraping.
     """
 
-    arg_parser = ArgumentParser(description="Arguments for which stocks to scrape")
+    arg_parser = ArgumentParser(
+        description="""Generate a report for stock mentions and the number of occurrences in /r/wallstreetbets. Options allow for different types of filters and thresholds. """
+    )
 
     arg_parser.add_argument(
         "type", help="Choose which submissions to search: top for the day, hot or new",

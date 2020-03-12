@@ -1,16 +1,17 @@
 ## Robin Stonks
 #### My lame attempt to have a python script manage my stock portfolio
 
-usage:
-This generates a mini report of the most talked about stocks and the configuration used.
+
 
 ```
-usage: python wsb_scraper.py [-h] [--type-flag TYPE_FLAG] [--submissions SUBMISSIONS]
+usage: wsb_scraper.py [-h] [--type-flag TYPE_FLAG] [--submissions SUBMISSIONS]
                       [-c COMMENTS] [-p PRINT] [-s SCORE]
                       [-i [IGNORE [IGNORE ...]]] [-d] [--debug]
                       type
 
-Arguments for which stocks to scrape
+Generate a report for stock mentions and the number of occurrences in
+/r/wallstreetbets. Options allow for different types of filters and
+thresholds.
 
 positional arguments:
   type                  Choose which submissions to search: top for the day,
@@ -19,7 +20,8 @@ positional arguments:
 optional arguments:
   -h, --help            show this help message and exit
   --type-flag TYPE_FLAG
-                        enter the type of sorting for 'Top': 'day, week, month'
+                        enter the type of sorting for 'Top': 'day, week,
+                        month'
   --submissions SUBMISSIONS
                         Enter the number of submissions to scrape
   -c COMMENTS, --comments COMMENTS
