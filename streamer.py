@@ -99,21 +99,9 @@ def get_sentiment(text):
         return "negative"
 
 
-def check_ticker(caps_list, ignore_list):
-    ticker_list = []
-    for word in caps_list:
-        if word in ignore_list:
-            continue
-        if word in symbols.keys():
-            logger.debug("Valid stock symbol found: %s", word)
-            ticker_list.append(word)
-
-    return ticker_list
-
-
 def scrape_for_caps(string):
     REGEX_STRING = "(^[A-Z]+$|^[A-Z]+[\-][A-Z]?$|^[A-Z]+[\.][A-Z]?$|^[$][A-Z]+$)"
-    words = re.findall("(\w+)", string)
+    words = re.findall("(\S+)", re.sub("([^\w\s])", "", string))
     if words:
         caps_list = []
         for word in words:
@@ -124,6 +112,18 @@ def scrape_for_caps(string):
                         caps_list.append(caps[0])
 
         return caps_list
+
+
+def check_ticker(caps_list, ignore_list):
+    ticker_list = []
+    for word in caps_list:
+        if word in ignore_list:
+            continue
+        if word in symbols.keys():
+            logger.debug("Valid stock symbol found: %s", word)
+            ticker_list.append(word)
+
+    return ticker_list
 
 
 def main(*args):

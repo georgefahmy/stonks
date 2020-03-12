@@ -34,4 +34,6 @@ DEFAULT_IGNORE_LIST = [
     "ELSE",
     "EDIT",
     "ATH",
+    "DO",
+    "VERY",
 ]

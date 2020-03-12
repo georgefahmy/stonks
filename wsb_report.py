@@ -121,7 +121,7 @@ for line in [line.rstrip("\n") for line in open("tickers.txt")]:
 # CAPS Scraper
 def scrape_for_caps(string):
     REGEX_STRING = "(^[A-Z]+$|^[A-Z]+[\-][A-Z]?$|^[A-Z]+[\.][A-Z]?$|^[$][A-Z]+$)"
-    words = re.findall("(\w+)", string)
+    words = re.findall("(\S+)", re.sub("([^\w\s])", "", string))
     if words:
         caps_list = []
         for word in words:
@@ -146,36 +146,6 @@ def check_ticker(caps_list, ignore_list):
     return ticker_list
 
 
-def print_top_count(wsb_ticker_list, frequency, parsed):
-
-    top_stocks = frequency.most_common(parsed.print)
-    if parsed.type == "day":
-        top_string = " for the {},".format(str(parsed.type_flag).lower())
-    else:
-        top_string = ""
-
-    print(
-        "\nConfiguration: Sorting {} {} submissions{} with comment depth of {} pages. Minimum submission score: {}. Minimum comment score: {}".format(
-            parsed.submissions,
-            str(parsed.type).capitalize(),
-            top_string,
-            parsed.comments,
-            parsed.sub_score,
-            parsed.com_score,
-        )
-    )
-    print("\nTop {} talked about stocks:".format(parsed.print))
-
-    for i in range(parsed.print):
-        print(
-            "[{}] - {}: {} occurances".format(
-                str(top_stocks[i][0]),
-                str(wsb_ticker_list[top_stocks[i][0]]),
-                str(top_stocks[i][1]),
-            )
-        )
-
-
 def get_sentiment(text):
     clean_text = " ".join(
         re.sub("(@[A-Za-z0-9]+)|([^0-9A-Za-z \t])|(\w+:\/\/\S+)", " ", text).split()
@@ -198,9 +168,11 @@ def find_stocks(wall_street_bets, parsed):
     logger.debug(ignore_list)
 
     wsb_ticker_list = {}
-
+    sub_counter = 1
     for submission in wall_street_bets:
-        logger.info("New Submission: %s", submission.title)
+
+        logger.info("New Submission %d: %s", sub_counter, submission.title)
+        sub_counter += 1
         logger.info("%d total comments found", len(submission.comments.list()))
 
         if submission.score > parsed.sub_score:
@@ -244,6 +216,36 @@ def find_stocks(wall_street_bets, parsed):
     logger.info("Total number unique stocks: %d", len(wsb_ticker_list))
 
     return wsb_ticker_list, Counter(count_list)
+
+
+def print_top_count(wsb_ticker_list, frequency, parsed):
+
+    top_stocks = frequency.most_common(parsed.print)
+    if parsed.type == "day":
+        top_string = " for the {},".format(str(parsed.type_flag).lower())
+    else:
+        top_string = ""
+
+    print(
+        "\nConfiguration: Sorting {} {} submissions{} with comment depth of {} pages. Minimum submission score: {}. Minimum comment score: {}".format(
+            parsed.submissions,
+            str(parsed.type).capitalize(),
+            top_string,
+            parsed.comments,
+            parsed.sub_score,
+            parsed.com_score,
+        )
+    )
+    print("\nTop {} talked about stocks:".format(min([parsed.print, len(wsb_ticker_list)])))
+
+    for i in range(min([parsed.print, len(wsb_ticker_list)])):
+        print(
+            "[{}] - {}: {} occurances".format(
+                str(top_stocks[i][0]),
+                str(wsb_ticker_list[top_stocks[i][0]]),
+                str(top_stocks[i][1]),
+            )
+        )
 
 
 def main(*args):
