@@ -152,10 +152,12 @@ def main(*args):
     logger.info("Starting stream!")
 
     for comment in stream:
-
+        logger.debug(comment)
         caps_list = scrape_for_caps(comment.body)
+        logger.debug(caps_list)
         if caps_list:
             ticker_list = check_ticker(caps_list, DEFAULT_IGNORE_LIST)
+            logger.debug(ticker_list)
             if ticker_list:
 
                 print(
