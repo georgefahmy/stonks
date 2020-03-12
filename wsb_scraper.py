@@ -71,10 +71,16 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
-        "-s",
-        "--score",
+        "--sub-score",
         default=5,
-        help="Minimum comment score to include in analysis. Default=20",
+        help="Minimum submission score to include in analysis. Default=5",
+        type=int,
+    )
+
+    arg_parser.add_argument(
+        "--com-score",
+        default=5,
+        help="Minimum comment score to include in analysis. Default=5",
         type=int,
     )
 
@@ -149,12 +155,13 @@ def print_top_count(wsb_ticker_list, frequency, parsed):
         top_string = ""
 
     print(
-        "\nConfiguration: Sorting {} {} submissions{} with comment depth of {} pages. Minimum comment score: {}".format(
+        "\nConfiguration: Sorting {} {} submissions{} with comment depth of {} pages. Minimum submission score: {}. Minimum comment score: {}".format(
             parsed.submissions,
             str(parsed.type).capitalize(),
             top_string,
             parsed.comments,
-            parsed.score,
+            parsed.sub_score,
+            parsed.com_score,
         )
     )
     print("\nTop {} talked about stocks:".format(parsed.print))
@@ -196,37 +203,38 @@ def find_stocks(wall_street_bets, parsed):
         logger.info("New Submission: %s", submission.title)
         logger.info("%d total comments found", len(submission.comments.list()))
 
-        caps_list = scrape_for_caps(submission.selftext)
+        if submission.score > parsed.sub_score:
+            caps_list = scrape_for_caps(submission.selftext)
 
-        if caps_list:
-            ticker_list = check_ticker(caps_list, ignore_list)
-            if ticker_list:
-                for ticker in ticker_list:
-                    count_list.append(ticker)
-                    wsb_ticker_list[ticker] = symbols[ticker]
+            if caps_list:
+                ticker_list = check_ticker(caps_list, ignore_list)
+                if ticker_list:
+                    for ticker in ticker_list:
+                        count_list.append(ticker)
+                        wsb_ticker_list[ticker] = symbols[ticker]
 
-        submission.comments.replace_more(limit=parsed.comments)
-        comment_stocks = []
-        filtered_comments = 0
-        for comment in submission.comments.list():
-            logger.debug(comment.author)
-            if comment.author == "AutoModerator":
-                logger.debug("Skipping AutoModerator")
-                continue
+            submission.comments.replace_more(limit=parsed.comments)
+            comment_stocks = []
+            filtered_comments = 0
+            for comment in submission.comments.list():
+                logger.debug(comment.author)
+                if comment.author == "AutoModerator":
+                    logger.debug("Skipping AutoModerator")
+                    continue
 
-            if comment.score > parsed.score:
-                filtered_comments += 1
-                caps_list = scrape_for_caps(comment.body)
-                if caps_list:
-                    ticker_list = check_ticker(caps_list, ignore_list)
-                    if ticker_list:
-                        logger.debug(get_sentiment(comment.body))
-                        for ticker in ticker_list:
-                            comment_stocks.append(ticker)
-                            count_list.append(ticker)
-                            wsb_ticker_list[ticker] = symbols[ticker]
-        logger.info("Comments above score threshold: %d", filtered_comments)
-        logger.info("Stocks found in comments: %d", len(comment_stocks))
+                if comment.score > parsed.com_score:
+                    filtered_comments += 1
+                    caps_list = scrape_for_caps(comment.body)
+                    if caps_list:
+                        ticker_list = check_ticker(caps_list, ignore_list)
+                        if ticker_list:
+                            logger.debug(get_sentiment(comment.body))
+                            for ticker in ticker_list:
+                                comment_stocks.append(ticker)
+                                count_list.append(ticker)
+                                wsb_ticker_list[ticker] = symbols[ticker]
+            logger.info("Comments above score threshold: %d", filtered_comments)
+            logger.info("Stocks found in comments: %d", len(comment_stocks))
 
     logger.info("Done!")
     logger.info("Total number unique stocks: %d", len(wsb_ticker_list))
