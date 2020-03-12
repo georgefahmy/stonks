@@ -29,4 +29,5 @@ DEFAULT_IGNORE_LIST = [
     "ALL",
     "JUST",
     "SO",
+    "IRS",
 ]
