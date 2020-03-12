@@ -170,6 +170,7 @@ def main(*args):
 
     # TODO add the current price for the stocks being talked about. use the Robinhood API or some other API
     # TODO add a check for puts or calls (p, c) in the comment to help with sentiment.
+    # TODO add comparison for stock prices current vs yesterday vs history patterns. need to research stock analysis algorithms.
 
 
 if __name__ == "__main__":
