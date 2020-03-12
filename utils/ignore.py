@@ -28,4 +28,5 @@ DEFAULT_IGNORE_LIST = [
     "CDC",
     "ALL",
     "JUST",
+    "SO",
 ]

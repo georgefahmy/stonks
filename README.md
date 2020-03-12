@@ -1,10 +1,20 @@
 ## Robin Stonks
 #### My lame attempt to have a python script manage my stock portfolio
 
+Best to run this in a virtual environment to keep things clean.
 
+`pip install -r requirements.txt`
+
+Run `python nltk_download.py` and download 'corpora'.
+_(need to look into this more for tuning the model)_
+
+Before running `streamer.py` or `wsb_report.py` scripts, run `python get_symbols.py` to generate the tickers.txt. This file
+is used for determining whether a set of capital letters used in a comment is a stock symbol or not.
+
+Main scripts help description below.
 
 ```
-usage: wsb_scraper.py [-h] [--type-flag TYPE_FLAG] [--submissions SUBMISSIONS]
+usage: wsb_report.py [-h] [--type-flag TYPE_FLAG] [--submissions SUBMISSIONS]
                       [-c COMMENTS] [-p PRINT] [-s SCORE]
                       [-i [IGNORE [IGNORE ...]]] [-d] [--debug]
                       type

@@ -233,8 +233,12 @@ def find_stocks(wall_street_bets, parsed):
                                 comment_stocks.append(ticker)
                                 count_list.append(ticker)
                                 wsb_ticker_list[ticker] = symbols[ticker]
+
             logger.info("Comments above score threshold: %d", filtered_comments)
             logger.info("Stocks found in comments: %d", len(comment_stocks))
+
+        else:
+            logger.warning("Submission below score threshold! Skipping")
 
     logger.info("Done!")
     logger.info("Total number unique stocks: %d", len(wsb_ticker_list))
