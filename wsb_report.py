@@ -221,7 +221,7 @@ def find_stocks(wall_street_bets, parsed):
 def print_top_count(wsb_ticker_list, frequency, parsed):
 
     top_stocks = frequency.most_common(parsed.print)
-    if parsed.type == "day":
+    if parsed.type == "top":
         top_string = " for the {},".format(str(parsed.type_flag).lower())
     else:
         top_string = ""
