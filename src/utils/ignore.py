@@ -22,6 +22,8 @@ DEFAULT_IGNORE_LIST = [
     "PDT",
     "BUY",
     "LOW",
+    "NEXT",
+    "PS",
     "PUMP",
     "CAN",
     "CASH",
