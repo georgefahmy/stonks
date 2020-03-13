@@ -169,20 +169,20 @@ def main(*args):
                         comment.submission.title, datetime.now(), comment.author, comment.body,
                     )
                 )
+                print("Stocks Found:")
+                for ticker in list(set(ticker_list)):
+                    print("[{}] {}\n".format(ticker, symbols[ticker]))
+
+                if parsed.sentiment:
+                    print("Sentiment:{}\n".format(get_sentiment(comment.body)))
+
                 if parsed.link:
                     comment_link = "www.reddit.com" + comment.permalink
                     print("URL: {}\n".format(comment_link))
 
-                if parsed.sentiment:
-                    print("Sentiment:\n{}\n".format(get_sentiment(comment.body)))
-
-                print("Stocks Found:")
-                for ticker in list(set(ticker_list)):
-                    print("[{}] {}".format(ticker, symbols[ticker]))
-
     # TODO add the current price for the stocks being talked about. use the Robinhood API or some other API
-    # TODO add a check for puts or calls (p, c) in the comment to help with sentiment.
-    # TODO add comparison for stock prices current vs yesterday vs history patterns. need to research stock analysis algorithms.
+    # TODO add a check for puts or calls (puts, calls, p, c) in the comment to help with sentiment.
+    # TODO add comparison for stock prices current vs yesterday vs history patterns, or other interesting comparisons.
 
 
 if __name__ == "__main__":
