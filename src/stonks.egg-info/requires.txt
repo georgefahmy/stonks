@@ -1,0 +1,4 @@
+praw==6.5.1
+textblob==0.15.3
+robin-stocks==0.9.9.6
+nltk==3.4.5

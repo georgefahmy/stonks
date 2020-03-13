@@ -1,0 +1,12 @@
+README.md
+setup.py
+src/stonks.egg-info/PKG-INFO
+src/stonks.egg-info/SOURCES.txt
+src/stonks.egg-info/dependency_links.txt
+src/stonks.egg-info/entry_points.txt
+src/stonks.egg-info/requires.txt
+src/stonks.egg-info/top_level.txt
+src/utils/__init__.py
+src/utils/get_symbols.py
+src/utils/ignore.py
+src/utils/nltk_download.py
