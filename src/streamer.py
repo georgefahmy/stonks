@@ -171,14 +171,14 @@ def main(*args):
                 )
                 print("Stocks Found:")
                 for ticker in list(set(ticker_list)):
-                    print("[{}] {}\n".format(ticker, symbols[ticker]))
+                    print("[{}] {}".format(ticker, symbols[ticker]))
 
                 if parsed.sentiment:
-                    print("Sentiment:{}\n".format(get_sentiment(comment.body)))
+                    print("\nSentiment:{}".format(get_sentiment(comment.body)))
 
                 if parsed.link:
                     comment_link = "www.reddit.com" + comment.permalink
-                    print("URL: {}\n".format(comment_link))
+                    print("\nURL: {}\n".format(comment_link))
 
     # TODO add the current price for the stocks being talked about. use the Robinhood API or some other API
     # TODO add a check for puts or calls (puts, calls, p, c) in the comment to help with sentiment.
