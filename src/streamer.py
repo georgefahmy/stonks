@@ -165,7 +165,7 @@ def main(*args):
             if ticker_list:
 
                 print(
-                    "\n-----{}-----\n[{}] {}: {}\n".format(
+                    "\n-----{}-----\n[{}] Comment by: /u/{}\n{}\n".format(
                         comment.submission.title, datetime.now(), comment.author, comment.body,
                     )
                 )

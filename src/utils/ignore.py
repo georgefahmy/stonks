@@ -38,4 +38,6 @@ DEFAULT_IGNORE_LIST = [
     "ATH",
     "DO",
     "VERY",
+    "ITM",
+    "IQ",
 ]
