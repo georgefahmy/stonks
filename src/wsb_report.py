@@ -121,7 +121,7 @@ for line in [line.rstrip("\n") for line in open("tickers.txt")]:
 # CAPS Scraper
 def scrape_for_caps(string):
     REGEX_STRING = "(^[A-Z]+$|^[A-Z]+[\-][A-Z]?$|^[A-Z]+[\.][A-Z]?$|^[$][A-Z]+$)"
-    words = re.findall("(\S+)", re.sub("([^\w\s])", "", string))
+    words = re.findall("(\S+)", re.sub("([^\w\s]+$)", "", string))
     if words:
         caps_list = []
         for word in words:

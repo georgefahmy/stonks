@@ -114,7 +114,7 @@ def get_sentiment(text):
 
 def scrape_for_caps(string):
     REGEX_STRING = "(^[A-Z]+$|^[A-Z]+[\-][A-Z]?$|^[A-Z]+[\.][A-Z]?$|^[$][A-Z]+$)"
-    words = re.findall("(\S+)", re.sub("([^\w\s])", "", string))
+    words = re.findall("(\S+)", re.sub("([^\w\s]+$)", "", string))
     if words:
         caps_list = []
         for word in words:
