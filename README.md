@@ -15,6 +15,10 @@ is used for determining whether a set of capital letters used in a comment is a 
 
 Main scripts help description below.
 
+If stock tickers are showing up that you suspect are not of importance, or actually being
+discussed, edit the `src/utils/ignore.py`. Also you can use the `-i <TICKER SYMBOLS...>` as an
+optional flag for temporarily ignoring additional stock symbols.
+
 ```
 usage: wsb_report.py [-h] [--type-flag TYPE_FLAG] [--submissions SUBMISSIONS]
                       [-c COMMENTS] [-p PRINT] [-s SCORE]
