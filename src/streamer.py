@@ -71,6 +71,14 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
+        "-m",
+        "--multi",
+        action="store_true",
+        default=False,
+        help="Optional flag to stream from r/wallstreetbets, r/wsb, r/investing. Default=False",
+    )
+
+    arg_parser.add_argument(
         "--debug", default=False, action="store_true", help="Displays debug messages in console",
     )
 
@@ -140,12 +148,22 @@ def main(*args):
     logger.addHandler(handler)
 
     # Stream Setup
-    logger.info("Getting WallStreetBets comments stream...")
-    stream = (
-        Reddit("wsb1", user_agent="extraction by /u/willfullytr")
-        .subreddit("wallstreetbets")
-        .stream.comments(skip_existing=True)
-    )
+
+    if parsed.multi:
+        logger.info("Multi stream selected: r/wsb, r/wallstreetbets, r/investing...")
+        stream = (
+            Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+            .subreddit("wallstreetbets+wsb+investing")
+            .stream.comments(skip_existing=True)
+        )
+
+    else:
+        logger.info("Getting WallStreetBets comments stream...")
+        stream = (
+            Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+            .subreddit("wallstreetbets")
+            .stream.comments(skip_existing=True)
+        )
 
     if parsed.link:
         logger.info("link flag set: will provide links in printout")
@@ -165,8 +183,12 @@ def main(*args):
             if ticker_list:
 
                 print(
-                    "\n-----{}-----\n[{}] Comment by: /u/{}\n{}\n".format(
-                        comment.submission.title, datetime.now(), comment.author, comment.body,
+                    "\n-----{}-----\n[{}] Comment by: /u/{} in /r/{}\n{}\n".format(
+                        comment.submission.title,
+                        datetime.now(),
+                        comment.author,
+                        comment.subreddit,
+                        comment.body,
                     )
                 )
                 print("Stocks Found:")

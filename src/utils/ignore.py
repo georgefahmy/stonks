@@ -40,4 +40,5 @@ DEFAULT_IGNORE_LIST = [
     "VERY",
     "ITM",
     "IQ",
+    "UI",
 ]
