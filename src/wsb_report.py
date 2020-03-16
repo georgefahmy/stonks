@@ -37,17 +37,20 @@ def get_arg_parser():
     """
 
     arg_parser = ArgumentParser(
-        description="""Generate a report for stock mentions and the number of occurrences in /r/wallstreetbets. Options allow for different types of filters and thresholds. """
+        description="""Generate a report for stock mentions and the number of occurrences
+            in /r/wallstreetbets. Options allow for different types of filters and thresholds. """
     )
 
     arg_parser.add_argument(
-        "type", help="Choose which submissions to search: top for the day, hot or new",
+        "type",
+        help="""Choose which submissions to search: top, hot or new, If top, --type-flag is
+            an optional flag to choose day, week, month, year, all""",
     )
 
     arg_parser.add_argument(
         "--type-flag",
         default="day",
-        help="enter the type of sorting for 'Top': 'day, week, month'",
+        help="enter the type of sorting for 'top': 'day, week, month'",
     )
 
     arg_parser.add_argument(
@@ -57,15 +60,15 @@ def get_arg_parser():
     arg_parser.add_argument(
         "-c",
         "--comments",
-        default=100,
-        help="Enter the limit for how many comment pages to scrape. Default=None",
+        default=10,
+        help="Enter the limit for how many comment pages to scrape. Default=10",
         type=int,
     )
 
     arg_parser.add_argument(
         "-p",
         "--print",
-        default=3,
+        default=5,
         help="Limit the number of stocks printed after scraping. Default=5",
         type=int,
     )

@@ -19,19 +19,22 @@ If stock tickers are showing up that you suspect are not of importance, or actua
 discussed, edit the `src/utils/ignore.py`. Also you can use the `-i <TICKER SYMBOLS...>` as an
 optional flag for temporarily ignoring additional stock symbols.
 
+### wsb_report
 ```
-usage: wsb_report.py [-h] [--type-flag TYPE_FLAG] [--submissions SUBMISSIONS]
-                      [-c COMMENTS] [-p PRINT] [-s SCORE]
-                      [-i [IGNORE [IGNORE ...]]] [-d] [--debug]
-                      type
+usage: wsb_report [-h] [--type-flag TYPE_FLAG] [--submissions SUBMISSIONS]
+                  [-c COMMENTS] [-p PRINT] [--sub-score SUB_SCORE]
+                  [--com-score COM_SCORE] [-i [IGNORE [IGNORE ...]]] [-d]
+                  [--debug]
+                  type
 
 Generate a report for stock mentions and the number of occurrences in
 /r/wallstreetbets. Options allow for different types of filters and
 thresholds.
 
 positional arguments:
-  type                  Choose which submissions to search: top for the day,
-                        hot or new
+  type                  Choose which submissions to search: top, hot or new,
+                        If top, --type-flag is an optional flag to choose day,
+                        week, month, year, all
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -46,9 +49,12 @@ optional arguments:
   -p PRINT, --print PRINT
                         Limit the number of stocks printed after scraping.
                         Default=5
-  -s SCORE, --score SCORE
+  --sub-score SUB_SCORE
+                        Minimum submission score to include in analysis.
+                        Default=5
+  --com-score COM_SCORE
                         Minimum comment score to include in analysis.
-                        Default=20
+                        Default=5
   -i [IGNORE [IGNORE ...]], --ignore [IGNORE [IGNORE ...]]
                         List of stock symbols to ignore
   -d, --display_dict    Option to display dictionary of all stocks found.
@@ -57,11 +63,14 @@ optional arguments:
 ```
 
 
-Live stream of comments posted to WSB and the stocks found in those comments, as well as the general sentiment (experimental)
-```
-usage: streamer.py [-h] [-l] [-s] [--debug]
+### streamer
 
-Arguments for which stocks to scrape
+```
+usage: streamer [-h] [-l] [-s] [-m] [--debug]
+
+Reddit WallStreetBets stream with stock extraction from comments. Includes
+comment sentiment as well as links to the comment URL. Stock symbol extraction
+can also be used to automate retrieving stock price information.
 
 optional arguments:
   -h, --help       show this help message and exit
@@ -69,5 +78,34 @@ optional arguments:
                    Default=False
   -s, --sentiment  Optional flag to display comment sentiment (experimental).
                    Default=False
+  -m, --multi      Optional flag to stream from r/wallstreetbets, r/wsb,
+                   r/investing. Default=False
   --debug          Displays debug messages in console
 ```
+
+### all_stream
+
+```
+usage: all_stream [-h] [-f [FILTER [FILTER ...]]] [-st] [-l] [-s] [--debug]
+                  [subreddits [subreddits ...]]
+
+all_stream.py streams one or more subreddits' comments. Add --filter option
+for filtering for specific words in the comment body. Additional options
+available
+
+positional arguments:
+  subreddits            Subreddit(s) to pull comment stream from.
+
+optional arguments:
+  -h, --help            show this help message and exit
+  -f [FILTER [FILTER ...]], --filter [FILTER [FILTER ...]]
+                        Optional flag to filter for specific text in comment
+                        body. Default=None
+  -S, --stocks         Optional flag to display stock information found in
+                        the comment. Default=False
+  -l, --link            Optional flag to display comment url in the stream.
+                        Default=False
+  -s, --sentiment       Optional flag to display comment sentiment
+                        (experimental). Default=False
+  --debug               Displays debug messages in console
+  ```

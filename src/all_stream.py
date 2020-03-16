@@ -49,23 +49,29 @@ def get_arg_parser():
     """
 
     arg_parser = ArgumentParser(
-        description="""all_stream.py requires a subreddit, and accepts optional filter flags, otherwise will stream all comments from the subreddit, with submission it is a part of."""
+        description="""all_stream.py streams one or more subreddits' comments.
+        Add --filter option for filtering for specific words in the comment body.
+        Additional options available"""
     )
 
     arg_parser.add_argument(
-        "subreddit", help="Subreddit to pull stream from.",
+        "subreddits", nargs="*", help="Subreddit(s) to pull comment stream from.",
     )
 
     arg_parser.add_argument(
-        "-f", "--filter", nargs="*", default=None, help="Optional flag to filter for specific text",
+        "-f",
+        "--filter",
+        nargs="*",
+        default=None,
+        help="Optional flag to filter for specific text in comment body. Default=None",
     )
 
     arg_parser.add_argument(
-        "-s",
+        "-S",
         "--stocks",
         action="store_true",
         default=False,
-        help="optional flag to display comment permalink in the stream. Default=False",
+        help="Optional flag to display stock information found in the comment. Default=False",
     )
 
     arg_parser.add_argument(
@@ -73,10 +79,11 @@ def get_arg_parser():
         "--link",
         action="store_true",
         default=False,
-        help="optional flag to display comment permalink in the stream. Default=False",
+        help="Optional flag to display comment url in the stream. Default=False",
     )
 
     arg_parser.add_argument(
+        "-s",
         "--sentiment",
         action="store_true",
         default=False,
@@ -153,10 +160,13 @@ def main(*args):
     logger.addHandler(handler)
 
     # Stream Setup
-    logger.info("Getting %s comments stream...", str(parsed.subreddit).capitalize())
+    sub_string = "+".join(parsed.subreddits)
+    logger_string = "r/" + ", r/".join(parsed.subreddits) + " ..."
+
+    logger.info("Starting stream for: %s", logger_string)
     stream = (
         Reddit("wsb1", user_agent="extraction by /u/willfullytr")
-        .subreddit(parsed.subreddit)
+        .subreddit(sub_string)
         .stream.comments(skip_existing=True)
     )
 
@@ -166,39 +176,52 @@ def main(*args):
     if parsed.sentiment:
         logger.info("Sentiment flag set: comment sentiment will be interpreted (experimental)")
 
-    logger.info("Starting stream!")
-    logger.info(parsed.filter)
+    logger.info("Filter for words: %s", parsed.filter)
     for comment in stream:
 
         if parsed.filter is not None:
-            if any(word in str(comment.body).lower() for word in str(parsed.filter).lower()):
+            comment_body = re.findall("(\S+)", re.sub("([^\w\s]+$)", "", str(comment.body).lower()))
+
+            if any(str(word).lower() in comment_body for word in parsed.filter):
                 logger.debug("Submission: %s", comment.submission.title)
                 logger.debug("Subreddit: %s", comment.subreddit)
 
                 print(
-                    "\n-----{}-----\n[{}] {}: {}\n".format(
-                        comment.submission.title, datetime.now(), comment.author, comment.body,
+                    "\n-----{}-----\n[{}] Comment by: /u/{} in /r/{}\n{}\n".format(
+                        comment.submission.title,
+                        datetime.now(),
+                        comment.author,
+                        comment.subreddit,
+                        comment.body,
                     )
                 )
+                found = True
+            else:
+                found = False
         else:
             logger.debug(comment)
             logger.debug("Submission: %s", comment.submission.title)
             logger.debug("Subreddit: %s", comment.subreddit)
 
             print(
-                "\n-----{}-----\n[{}] {}: {}\n".format(
-                    comment.submission.title, datetime.now(), comment.author, comment.body,
+                "\n-----{}-----\n[{}] Comment by: /u/{} in /r/{}\n{}\n".format(
+                    comment.submission.title,
+                    datetime.now(),
+                    comment.author,
+                    comment.subreddit,
+                    comment.body,
                 )
             )
+            found = True
 
-        if parsed.link:
+        if parsed.link and found:
             comment_link = "www.reddit.com" + comment.permalink
             print("URL: {}\n".format(comment_link))
 
-        if parsed.sentiment:
+        if parsed.sentiment and found:
             print("Sentiment:\n{}\n".format(get_sentiment(comment.body)))
 
-        if parsed.stocks:
+        if parsed.stocks and found:
             caps_list = scrape_for_caps(comment.body)
             logger.debug(caps_list)
 
@@ -207,7 +230,6 @@ def main(*args):
                 logger.debug(ticker_list)
 
                 if ticker_list:
-
                     print("Stocks Found:")
                     for ticker in list(set(ticker_list)):
                         print("[{}] {}".format(ticker, symbols[ticker]))

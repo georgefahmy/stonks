@@ -150,10 +150,14 @@ def main(*args):
     # Stream Setup
 
     if parsed.multi:
-        logger.info("Multi stream selected: r/wsb, r/wallstreetbets, r/investing...")
+        subreddits = ["wallstreetbets", "wsb", "investing"]
+        sub_string = "+".join(subreddits)
+        logger_string = "r/" + ", r/".join(subreddits) + " ..."
+
+        logger.info("Starting multireddit stream for: %s", logger_string)
         stream = (
             Reddit("wsb1", user_agent="extraction by /u/willfullytr")
-            .subreddit("wallstreetbets+wsb+investing")
+            .subreddit(sub_string)
             .stream.comments(skip_existing=True)
         )
 
