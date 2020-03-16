@@ -7,7 +7,7 @@ Best to run this in a virtual environment to keep things clean.
 
 `pip install -r requirements.txt`
 
-Run `python nltk_download.py` and download 'corpora'.
+Run `python nltk_download.py` and download 'all-corpora'.
 _(need to look into this more for tuning the model)_
 
 Before running `streamer.py` or `wsb_report.py` scripts, run `python get_symbols.py` to generate the tickers.txt. This file
