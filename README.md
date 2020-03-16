@@ -5,12 +5,15 @@ Best to run this in a virtual environment to keep things clean.
 
 `git clone https://github.com/georgefahmy/stonks.git`
 
-`pip install -r requirements.txt`
+`cd stonks`
+
+`pip install .`
+
 
 Run `python nltk_download.py` and download 'all-corpora'.
 _(need to look into this more for tuning the model)_
 
-Before running `streamer.py` or `wsb_report.py` scripts, run `python get_symbols.py` to generate the tickers.txt. This file
+Before running any scripts, run `get_symbols` to generate the tickers.txt. This file
 is used for determining whether a set of capital letters used in a comment is a stock symbol or not.
 
 Main scripts help description below.

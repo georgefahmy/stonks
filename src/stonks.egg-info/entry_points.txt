@@ -1,5 +1,0 @@
-[console_scripts]
-all_stream = all_stream:main
-streamer = streamer:main
-wsb_report = wsb_report:main
-

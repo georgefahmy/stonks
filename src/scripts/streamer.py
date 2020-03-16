@@ -109,10 +109,11 @@ def get_sentiment(text):
 
 def scrape_for_caps(string):
     REGEX_STRING = "(^[A-Z]+$|^[A-Z]+[\-][A-Z]?$|^[A-Z]+[\.][A-Z]?$|^[$][A-Z]+$)"
-    words = re.findall("(\S+)", re.sub("([^\w\s]+$)", "", string))
+    words = re.findall("(\S+)", string)
     if words:
         caps_list = []
         for word in words:
+            word = re.sub("([^\w\s]+$)", "", word)
             if len(word) < 5:
                 if not word.istitle():
                     caps = re.findall(REGEX_STRING, word)
@@ -200,7 +201,7 @@ def main(*args):
                     print("[{}] {}".format(ticker, symbols[ticker]))
 
                 if parsed.sentiment:
-                    print("\nSentiment:{}".format(get_sentiment(comment.body)))
+                    print("\nComment sentiment: {}".format(get_sentiment(comment.body)))
 
                 if parsed.link:
                     comment_link = "www.reddit.com" + comment.permalink
