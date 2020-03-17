@@ -24,6 +24,9 @@ from datetime import datetime
 from pprint import pprint
 
 # Extended Python #
+import yahoo_fin.stock_info as si
+import yahoo_fin.options as oi
+
 from argparse import ArgumentParser
 from praw import Reddit
 from textblob import TextBlob
@@ -198,7 +201,10 @@ def main(*args):
                 )
                 print("Stocks Found:")
                 for ticker in list(set(ticker_list)):
-                    print("[{}] {}".format(ticker, symbols[ticker]))
+                    ticker_price = round(si.get_live_price(ticker), 3)
+                    print(
+                        "[{}] {}\nCurrent Price: {}".format(ticker, symbols[ticker], ticker_price)
+                    )
 
                 if parsed.sentiment:
                     print("\nComment sentiment: {}".format(get_sentiment(comment.body)))
@@ -207,7 +213,7 @@ def main(*args):
                     comment_link = "www.reddit.com" + comment.permalink
                     print("\nURL: {}\n".format(comment_link))
 
-    # TODO add the current price for the stocks being talked about. use the Robinhood API or some other API
+    # TODO add check for volume of options purchased, open interest to check trends of stock interest.
     # TODO add a check for puts or calls (puts, calls, p, c) in the comment to help with sentiment.
     # TODO add comparison for stock prices current vs yesterday vs history patterns, or other interesting comparisons.
 

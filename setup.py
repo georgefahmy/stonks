@@ -22,7 +22,15 @@ setuptools.setup(
     zip_safe=False,
     python_requires=">=3.6",
     setup_requires=[],
-    install_requires=["praw==6.5.1", "textblob==0.15.3", "robin-stocks==0.9.9.6", "pytz==2019.3"],
+    install_requires=[
+        "praw==6.5.1",
+        "textblob==0.15.3",
+        "robin-stocks==0.9.9.6",
+        "pytz==2019.3",
+        "requests-html==0.10.0",
+        "yahoo-fin==0.8.4",
+        "pandas==1.0.2",
+    ],
     classifiers=["Programming Language :: Python :: 3", "Programming Language :: Python :: 3.7",],
     entry_points={
         "console_scripts": [
