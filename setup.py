@@ -8,7 +8,7 @@ with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
 
 setuptools.setup(
     name="stonks",
-    version="1.0.1",
+    version="1.0.2",
     author="georgefahmy",
     author_email="geofahm@gmail.com",
     description="Generate a report or stream live stocks from wallstreetbets",

@@ -1,3 +1,15 @@
+"""
+get_symbols.py
+Date Created: March 13th, 2020
+
+Author: georgefahmy
+
+Description: Generate the list of stock symbols used for searching the stocks.
+
+"""
+
+
+# Base Python #
 import ftplib
 import logging
 import os

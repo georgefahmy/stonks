@@ -203,7 +203,7 @@ def main(*args):
                 for ticker in list(set(ticker_list)):
                     ticker_price = round(si.get_live_price(ticker), 3)
                     print(
-                        "[{}] {}\nCurrent Price: {}".format(ticker, symbols[ticker], ticker_price)
+                        "[{}] {}\nCurrent Price: ${}".format(ticker, symbols[ticker], ticker_price)
                     )
 
                 if parsed.sentiment:
