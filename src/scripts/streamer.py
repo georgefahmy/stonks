@@ -187,7 +187,7 @@ def main(*args):
     if parsed.sentiment:
         logger.info("Sentiment flag set: comment sentiment will be interpreted (experimental)")
 
-    if not parsed.price:
+    if not parsed.no_price:
         logger.info("no-price flag is set. price information will be turned off.")
 
     logger.info("Starting stream!")
@@ -212,10 +212,10 @@ def main(*args):
                 )
                 print("Stocks Found:")
                 for ticker in list(set(ticker_list)):
-                    if parsed.price:
+                    if parsed.no_price:
                         price_string = ""
 
-                    elif not parsed.price:
+                    elif not parsed.no_price:
                         ticker_price = round(si.get_live_price(ticker), 3)
                         ticker_prct = round(
                             (

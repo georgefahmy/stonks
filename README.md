@@ -10,7 +10,7 @@ Best to run this in a virtual environment to keep things clean.
 `pip install .`
 
 
-Run `python nltk_download.py` and download 'all-corpora'.
+Run `python src/utils/nltk_download.py` and download 'all-corpora'.
 _(need to look into this more for tuning the model)_
 
 Before running any scripts, run `get_symbols` to generate the tickers.txt. This file
