@@ -58,6 +58,14 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
+        "-p",
+        "--no-price",
+        action="store_true",
+        default=True,
+        help="optional flag to display pricing info. Default=False",
+    )
+
+    arg_parser.add_argument(
         "-l",
         "--link",
         action="store_true",
@@ -116,7 +124,7 @@ def scrape_for_caps(string):
     if words:
         caps_list = []
         for word in words:
-            word = re.sub("([^\w\s]+$)", "", word)
+            word = re.sub("([^\w\s]+$|^[^\w\s]+)", "", word)
             if len(word) < 5:
                 if not word.istitle():
                     caps = re.findall(REGEX_STRING, word)
@@ -179,6 +187,9 @@ def main(*args):
     if parsed.sentiment:
         logger.info("Sentiment flag set: comment sentiment will be interpreted (experimental)")
 
+    if not parsed.price:
+        logger.info("no-price flag is set. price information will be turned off.")
+
     logger.info("Starting stream!")
 
     for comment in stream:
@@ -201,10 +212,25 @@ def main(*args):
                 )
                 print("Stocks Found:")
                 for ticker in list(set(ticker_list)):
-                    ticker_price = round(si.get_live_price(ticker), 3)
-                    print(
-                        "[{}] {}\nCurrent Price: ${}".format(ticker, symbols[ticker], ticker_price)
-                    )
+                    if parsed.price:
+                        price_string = ""
+
+                    elif not parsed.price:
+                        ticker_price = round(si.get_live_price(ticker), 3)
+                        ticker_prct = round(
+                            (
+                                (
+                                    ticker_price
+                                    - round(si.get_quote_table(ticker)["Previous Close"], 3)
+                                )
+                                / round(si.get_quote_table(ticker)["Previous Close"], 3)
+                                * 100
+                            ),
+                            3,
+                        )
+                        price_string = "\nLast Price: ${} ({}%)".format(ticker_price, ticker_prct)
+
+                    print("[{}] {}".format(ticker, symbols[ticker]) + price_string)
 
                 if parsed.sentiment:
                     print("\nComment sentiment: {}".format(get_sentiment(comment.body)))
