@@ -61,8 +61,8 @@ def get_arg_parser():
         "-p",
         "--no-price",
         action="store_true",
-        default=True,
-        help="optional flag to display pricing info. Default=False",
+        default=False,
+        help="optional flag to hide pricing info. Default=False",
     )
 
     arg_parser.add_argument(
@@ -187,7 +187,7 @@ def main(*args):
     if parsed.sentiment:
         logger.info("Sentiment flag set: comment sentiment will be interpreted (experimental)")
 
-    if not parsed.no_price:
+    if parsed.no_price:
         logger.info("no-price flag is set. price information will be turned off.")
 
     logger.info("Starting stream!")
