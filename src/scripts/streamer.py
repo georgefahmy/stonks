@@ -62,7 +62,7 @@ def get_arg_parser():
         "--no-price",
         action="store_true",
         default=False,
-        help="optional flag to hide pricing info. Default=False",
+        help="Optional flag to hide pricing info. Default=False",
     )
 
     arg_parser.add_argument(
@@ -70,7 +70,7 @@ def get_arg_parser():
         "--link",
         action="store_true",
         default=False,
-        help="optional flag to display comment permalink in the stream. Default=False",
+        help="Optional flag to display comment permalink in the stream. Default=False",
     )
 
     arg_parser.add_argument(
@@ -188,7 +188,7 @@ def main(*args):
         logger.info("Sentiment flag set: comment sentiment will be interpreted (experimental)")
 
     if parsed.no_price:
-        logger.info("no-price flag is set. price information will be turned off.")
+        logger.info("No-Price flag set. Price information will be turned off.")
 
     logger.info("Starting stream!")
 
@@ -216,19 +216,18 @@ def main(*args):
                         price_string = ""
 
                     elif not parsed.no_price:
-                        ticker_price = round(si.get_live_price(ticker), 3)
-                        ticker_prct = round(
-                            (
-                                (
-                                    ticker_price
-                                    - round(si.get_quote_table(ticker)["Previous Close"], 3)
-                                )
-                                / round(si.get_quote_table(ticker)["Previous Close"], 3)
-                                * 100
-                            ),
-                            3,
-                        )
-                        price_string = "\nLast Price: ${} ({}%)".format(ticker_price, ticker_prct)
+                        try:
+                            live_price = round(si.get_live_price(ticker), 3)
+                            ticker_table = si.get_quote_table(ticker)
+                            prev_close = round(ticker_table["Previous Close"])
+                            ticker_prct = round(((live_price - prev_close) / prev_close * 100), 3)
+
+                        except:
+                            logger.warning("Unable to retrieve Price Data")
+                            live_price = "--"
+                            ticker_pct = "--"
+
+                        price_string = "\nLast Price: ${} ({}%)".format(live_price, ticker_prct)
 
                     print("[{}] {}".format(ticker, symbols[ticker]) + price_string)
 
