@@ -42,4 +42,5 @@ DEFAULT_IGNORE_LIST = [
     "IQ",
     "UI",
     "NEED",
+    "CEO",
 ]
