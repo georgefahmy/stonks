@@ -21,6 +21,7 @@ from argparse import ArgumentParser
 from collections import Counter
 
 # Extended Python #
+from pathlib import Path
 from praw import Reddit
 from pprint import pprint
 from textblob import TextBlob
@@ -30,6 +31,7 @@ from utils.ignore import DEFAULT_IGNORE_LIST
 logger = logging.getLogger(__name__)
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
+TICKERS = Path("tickers.txt").resolve()
 
 # Arg Parser setup #
 def get_arg_parser():
@@ -117,7 +119,7 @@ def parse_args(args):
 
 # Generate Tickers dictionary
 symbols = {}
-for line in [line.rstrip("\n") for line in open("tickers.txt")]:
+for line in [line.rstrip("\n") for line in open(TICKERS)]:
     symbols[line.split("|")[0]] = line.split("|")[1]
 
 
