@@ -41,6 +41,8 @@ LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 TICKERS = Path("tickers.txt").resolve()
 
+if not os.path.isfile(TICKERS):
+    os.system("get_symbols")
 
 # Generate Tickers dictionary
 logger.info("generating Symbols list")
@@ -171,7 +173,7 @@ def main(*args):
 
         logger.info("Starting multireddit stream for: %s", logger_string)
         stream = (
-            Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+            Reddit("wsb1", user_agent="extraction by /u/wsb-scraper")
             .subreddit(sub_string)
             .stream.comments(skip_existing=True)
         )
@@ -179,7 +181,7 @@ def main(*args):
     else:
         logger.info("Getting WallStreetBets comments stream...")
         stream = (
-            Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+            Reddit("wsb1", user_agent="extraction by /u/wsb-scraper")
             .subreddit("wallstreetbets")
             .stream.comments(skip_existing=True)
         )
