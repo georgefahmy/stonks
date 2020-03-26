@@ -173,7 +173,11 @@ def main(*args):
 
         logger.info("Starting multireddit stream for: %s", logger_string)
         stream = (
-            Reddit("wsb1", user_agent="extraction by /u/wsb-scraper")
+            Reddit(
+                client_id="vRhMbe_s-60osQ",
+                client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
+                user_agent="extraction by /u/wsb-scraper",
+            )
             .subreddit(sub_string)
             .stream.comments(skip_existing=True)
         )
@@ -181,7 +185,11 @@ def main(*args):
     else:
         logger.info("Getting WallStreetBets comments stream...")
         stream = (
-            Reddit("wsb1", user_agent="extraction by /u/wsb-scraper")
+            Reddit(
+                client_id="vRhMbe_s-60osQ",
+                client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
+                user_agent="extraction by /u/wsb-scraper",
+            )
             .subreddit("wallstreetbets")
             .stream.comments(skip_existing=True)
         )

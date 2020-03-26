@@ -165,7 +165,11 @@ def main(*args):
 
     logger.info("Starting stream for: %s", logger_string)
     stream = (
-        Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+        Reddit(
+            client_id="vRhMbe_s-60osQ",
+            client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
+            user_agent="extraction by /u/willfullytr",
+        )
         .subreddit(sub_string)
         .stream.comments(skip_existing=True)
     )

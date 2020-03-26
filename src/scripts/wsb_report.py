@@ -270,7 +270,11 @@ def main(*args):
         logger.info("Top %d submissions for the %s:", parsed.submissions, parsed.type_flag)
 
         wall_street_bets = (
-            Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+            Reddit(
+                client_id="vRhMbe_s-60osQ",
+                client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
+                user_agent="extraction by /u/willfullytr",
+            )
             .subreddit("wallstreetbets")
             .top(str(parsed.type_flag).lower(), limit=parsed.submissions)
         )
@@ -279,7 +283,11 @@ def main(*args):
         logger.info("Hot %d submissions:", parsed.submissions)
 
         wall_street_bets = (
-            Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+            Reddit(
+                client_id="vRhMbe_s-60osQ",
+                client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
+                user_agent="extraction by /u/willfullytr",
+            )
             .subreddit("wallstreetbets")
             .hot(limit=parsed.submissions)
         )
@@ -288,7 +296,11 @@ def main(*args):
         logger.info("%d new submissions:", parsed.submissions)
 
         wall_street_bets = (
-            Reddit("wsb1", user_agent="extraction by /u/willfullytr")
+            Reddit(
+                client_id="vRhMbe_s-60osQ",
+                client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
+                user_agent="extraction by /u/willfullytr",
+            )
             .subreddit("wallstreetbets")
             .new(limit=parsed.submissions)
         )
