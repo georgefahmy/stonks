@@ -223,7 +223,11 @@ def main(*args):
                         comment.body,
                     )
                 )
-                print("Stocks Found:")
+                if len(list(set(ticker_list))) == 1:
+                    print("{} stock Found:".format(len(list(set(ticker_list)))))
+                else:
+                    print("{} stocks Found:".format(len(list(set(ticker_list)))))
+
                 for ticker in list(set(ticker_list)):
                     if parsed.no_price:
                         price_string = ""
@@ -238,7 +242,7 @@ def main(*args):
                         except:
                             logger.warning("Unable to retrieve Price Data")
                             live_price = "--"
-                            ticker_pct = "--"
+                            ticker_prct = "--"
 
                         price_string = "\nLast Price: ${} ({}%)".format(live_price, ticker_prct)
 
