@@ -43,4 +43,5 @@ DEFAULT_IGNORE_LIST = [
     "UI",
     "NEED",
     "CEO",
+    "I",
 ]
