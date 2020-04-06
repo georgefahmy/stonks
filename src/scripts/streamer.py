@@ -197,15 +197,21 @@ def main(*args):
                             ticker_table = si.get_quote_table(ticker)
                             prev_close = round(ticker_table["Previous Close"])
                             ticker_prct = round(((live_price - prev_close) / prev_close * 100), 3)
+                            volume = round(ticker_table["Volume"])
 
                         except:
                             logger.warning("Unable to retrieve Price Data")
                             live_price = "--"
                             ticker_prct = "--"
+                            volume = "--"
 
                         price_string = "\nLast Price: ${} ({}%)".format(live_price, ticker_prct)
+                        if isinstance(volume, int):
+                            volume_string = "\nVolume: {:,}".format(volume)
+                        else:
+                            volume_string = "\nVolume: {}".format(volume)
 
-                    print("[{}] {}".format(ticker, symbols[ticker]) + price_string)
+                    print("[{}] {}".format(ticker, symbols[ticker]) + price_string + volume_string)
 
                 if parsed.sentiment:
                     print("\nComment sentiment: {}".format(get_sentiment(comment.body)))
