@@ -22,6 +22,7 @@ import sys
 
 from datetime import datetime
 from pprint import pprint
+from itertools import islice
 
 # Extended Python #
 import yahoo_fin.stock_info as si
@@ -184,10 +185,16 @@ def main(*args):
                 )
                 if len(list(set(ticker_list))) == 1:
                     print("{} stock Found:".format(len(list(set(ticker_list)))))
+
+                elif len(list(set(ticker_list))) > 20:
+                    print("{} stocks Found, truncated list:".format(len(list(set(ticker_list)))))
+
                 else:
                     print("{} stocks Found:".format(len(list(set(ticker_list)))))
 
-                for ticker in list(set(ticker_list)):
+                for ticker in islice(
+                    list(set(ticker_list)), 0, min([len(list(set(ticker_list))), 20])
+                ):
                     if parsed.no_price:
                         price_string = ""
 
@@ -195,7 +202,7 @@ def main(*args):
                         try:
                             live_price = round(si.get_live_price(ticker), 3)
                             ticker_table = si.get_quote_table(ticker)
-                            prev_close = round(ticker_table["Previous Close"])
+                            prev_close = round(ticker_table["Previous Close"], 3)
                             ticker_prct = round(((live_price - prev_close) / prev_close * 100), 3)
                             volume = round(ticker_table["Volume"])
 
@@ -207,14 +214,14 @@ def main(*args):
 
                         price_string = "\nLast Price: ${} ({}%)".format(live_price, ticker_prct)
                         if isinstance(volume, int):
-                            volume_string = "\nVolume: {:,}".format(volume)
+                            volume_string = "\nVolume: {:,}\n".format(volume)
                         else:
-                            volume_string = "\nVolume: {}".format(volume)
+                            volume_string = "\nVolume: {}\n".format(volume)
 
                     print("[{}] {}".format(ticker, symbols[ticker]) + price_string + volume_string)
 
                 if parsed.sentiment:
-                    print("\nComment sentiment: {}".format(get_sentiment(comment.body)))
+                    print("Comment sentiment: {}".format(get_sentiment(comment.body)))
 
                 if parsed.link:
                     comment_link = "www.reddit.com" + comment.permalink
