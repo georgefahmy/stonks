@@ -127,7 +127,14 @@ def main(*args):
     # Stream Setup
 
     if parsed.multi:
-        subreddits = ["wallstreetbets", "wsb", "investing", "smallstreetbets"]
+        subreddits = [
+            "wallstreetbets",
+            "wsb",
+            "investing",
+            "smallstreetbets",
+            "wallstreetbets2",
+            "wall_street_bets",
+        ]
         sub_string = "+".join(subreddits)
 
         logger_string = "r/" + ", r/".join(subreddits) + " ..."
@@ -159,6 +166,9 @@ def main(*args):
     logger.info("Starting stream!")
 
     for comment in stream:
+        if comment.author == "TickerBaby":
+            continue
+
         logger.debug(comment)
         caps_list = scrape_for_caps(comment.body)
         logger.debug(caps_list)

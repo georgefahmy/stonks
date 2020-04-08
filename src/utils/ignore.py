@@ -46,4 +46,5 @@ DEFAULT_IGNORE_LIST = [
     "I",
     "TA",
     "A",
+    "GDP",
 ]
