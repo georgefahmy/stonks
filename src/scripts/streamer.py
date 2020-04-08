@@ -92,7 +92,7 @@ def get_arg_parser():
         "--multi",
         action="store_true",
         default=False,
-        help="Optional flag to stream from r/wallstreetbets, r/wsb, r/investing. Default=False",
+        help="Optional flag to stream from r/wallstreetbets, r/smallstreetbets, r/wsb, r/investing. Default=False",
     )
 
     arg_parser.add_argument(
@@ -127,32 +127,25 @@ def main(*args):
     # Stream Setup
 
     if parsed.multi:
-        subreddits = ["wallstreetbets", "wsb", "investing"]
+        subreddits = ["wallstreetbets", "wsb", "investing", "smallstreetbets"]
         sub_string = "+".join(subreddits)
-        logger_string = "r/" + ", r/".join(subreddits) + " ..."
 
+        logger_string = "r/" + ", r/".join(subreddits) + " ..."
         logger.info("Starting multireddit stream for: %s", logger_string)
-        stream = (
-            Reddit(
-                client_id="vRhMbe_s-60osQ",
-                client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
-                user_agent="extraction by /u/wsb-scraper",
-            )
-            .subreddit(sub_string)
-            .stream.comments(skip_existing=True)
-        )
 
     else:
+        sub_string = "wallstreetbets"
         logger.info("Getting WallStreetBets comments stream...")
-        stream = (
-            Reddit(
-                client_id="vRhMbe_s-60osQ",
-                client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
-                user_agent="extraction by /u/wsb-scraper",
-            )
-            .subreddit("wallstreetbets")
-            .stream.comments(skip_existing=True)
+
+    stream = (
+        Reddit(
+            client_id="vRhMbe_s-60osQ",
+            client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
+            user_agent="extraction by /u/wsb-scraper",
         )
+        .subreddit(sub_string)
+        .stream.comments(skip_existing=True)
+    )
 
     if parsed.link:
         logger.info("link flag set: will provide links in printout")
