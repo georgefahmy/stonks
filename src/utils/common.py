@@ -66,7 +66,7 @@ def scrape_for_caps(string):
                 caps = re.findall(REGEX_STRING, word)
                 if caps:
                     caps_list.append(caps[0])
-            if len(word) < 5:
+            if len(word) <= 5:
                 if not word.istitle():
                     caps = re.findall(REGEX_STRING, word)
                     if caps:
