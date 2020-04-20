@@ -30,6 +30,7 @@ setuptools.setup(
         "requests-html==0.10.0",
         "yahoo-fin==0.8.4",
         "pandas==1.0.2",
+        "better-profanity==0.6.1",
     ],
     classifiers=["Programming Language :: Python :: 3", "Programming Language :: Python :: 3.7",],
     entry_points={

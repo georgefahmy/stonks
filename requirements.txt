@@ -5,3 +5,4 @@ pytz==2019.3
 yahoo-fin==0.8.4
 requests-html==0.10.0
 pandas==1.0.2
+better-profanity==0.6.1

@@ -69,7 +69,7 @@ optional arguments:
 ### streamer
 
 ```
-usage: streamer [-h] [-l] [-s] [-m] [--debug]
+usage: streamer [-h] [-p] [-l] [-s] [-m] [-c] [--debug]
 
 Reddit WallStreetBets stream with stock extraction from comments. Includes
 comment sentiment as well as links to the comment URL. Stock symbol extraction
@@ -77,12 +77,15 @@ can also be used to automate retrieving stock price information.
 
 optional arguments:
   -h, --help       show this help message and exit
-  -l, --link       optional flag to display comment permalink in the stream.
+  -p, --no-price   Optional flag to hide pricing info. Default=False
+  -l, --link       Optional flag to display comment permalink in the stream.
                    Default=False
   -s, --sentiment  Optional flag to display comment sentiment (experimental).
                    Default=False
-  -m, --multi      Optional flag to stream from r/wallstreetbets, r/wsb,
-                   r/investing. Default=False
+  -m, --multi      Optional flag to stream from r/wallstreetbets,
+                   r/smallstreetbets, r/wsb, r/investing. Default=False
+  -c, --censor     Optional flag to censor bad words in comment body.
+                   Default=False
   --debug          Displays debug messages in console
 ```
 
