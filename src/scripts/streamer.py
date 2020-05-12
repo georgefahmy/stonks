@@ -34,6 +34,7 @@ from praw import Reddit
 from better_profanity import profanity
 from utils.ignore import DEFAULT_IGNORE_LIST
 from utils.common import check_ticker, get_sentiment, scrape_for_caps
+from utils.url_shortener import make_tiny
 
 
 # Logger
@@ -244,8 +245,8 @@ def main(*args):
                     print("Comment sentiment: {}".format(get_sentiment(comment.body)))
 
                 if parsed.link:
-                    comment_link = "www.reddit.com" + comment.permalink
-                    print("\nURL: {}\n".format(comment_link))
+                    comment_link = "www.reddit.com" + str(comment.permalink)
+                    print("Link: {}\n".format(make_tiny(comment_link)))
 
     # TODO add check for volume of options purchased, open interest to check trends of stock interest.
     # TODO add a check for puts or calls (puts, calls, p, c) in the comment to help with sentiment.
