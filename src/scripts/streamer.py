@@ -31,8 +31,10 @@ import yahoo_fin.options as oi
 from argparse import ArgumentParser
 from pathlib import Path
 from praw import Reddit
+from better_profanity import profanity
 from utils.ignore import DEFAULT_IGNORE_LIST
 from utils.common import check_ticker, get_sentiment, scrape_for_caps
+from utils.url_shortener import make_tiny
 
 
 # Logger
@@ -41,6 +43,8 @@ logger = logging.getLogger(__name__)
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 TICKERS = Path("tickers.txt").resolve()
+
+profanity.load_censor_words()
 
 if not os.path.isfile(TICKERS):
     os.system("get_symbols")
@@ -93,6 +97,14 @@ def get_arg_parser():
         action="store_true",
         default=False,
         help="Optional flag to stream from r/wallstreetbets, r/smallstreetbets, r/wsb, r/investing. Default=False",
+    )
+
+    arg_parser.add_argument(
+        "-c",
+        "--censor",
+        action="store_true",
+        default=False,
+        help="Optional flag to censor bad words in comment body. Default=False",
     )
 
     arg_parser.add_argument(
@@ -166,6 +178,9 @@ def main(*args):
     logger.info("Starting stream!")
 
     for comment in stream:
+        if comment.author in ["TickerBaby", "AutoModerator"]:
+            continue
+
         logger.debug(comment)
         caps_list = scrape_for_caps(comment.body)
         logger.debug(caps_list)
@@ -174,13 +189,19 @@ def main(*args):
             logger.debug(ticker_list)
             if ticker_list:
 
+                if parsed.censor:
+                    comment_body = profanity.censor(comment.body)
+
+                else:
+                    comment_body = comment.body
+
                 print(
                     "\n-----{}-----\n[{}] Comment by: /u/{} in /r/{}\n{}\n".format(
                         comment.submission.title,
                         datetime.now(),
                         comment.author,
                         comment.subreddit,
-                        comment.body,
+                        comment_body,
                     )
                 )
                 if len(list(set(ticker_list))) == 1:
@@ -224,8 +245,8 @@ def main(*args):
                     print("Comment sentiment: {}".format(get_sentiment(comment.body)))
 
                 if parsed.link:
-                    comment_link = "www.reddit.com" + comment.permalink
-                    print("\nURL: {}\n".format(comment_link))
+                    comment_link = "www.reddit.com" + str(comment.permalink)
+                    print("Link: {}\n".format(make_tiny(comment_link)))
 
     # TODO add check for volume of options purchased, open interest to check trends of stock interest.
     # TODO add a check for puts or calls (puts, calls, p, c) in the comment to help with sentiment.
