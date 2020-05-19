@@ -1,7 +1,7 @@
 import numpy as np
 
 from pprint import pprint
-from matplotlib import pyplot as plt, rcParams
+from matplotlib import pyplot as plt, rcParams, ticker
 
 
 SEC_PER_HOUR = 3600
@@ -18,7 +18,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
 
     # for debugging purposes
     if False:
-        pprint(options.head(20).to_dict())
+        pprint(options.head(1).to_dict())
         # pprint(quote.head(1).to_dict())
         # print(quote["description"].values[0])
     if fig_size is None:
@@ -40,6 +40,8 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
     call_interest = call_options["openInterest"].to_numpy()
     call_strikes = call_options["strikePrice"].to_numpy()
     call_symbol = call_options["symbol"].to_numpy()
+    call_bid = call_options["bid"].to_numpy()
+    call_ask = call_options["ask"].to_numpy()
 
     # Isolate the put options
     put_options = options[options["putCall"] == "PUT"]
@@ -48,6 +50,8 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
     put_interest = put_options["openInterest"].to_numpy()
     put_strikes = put_options["strikePrice"].to_numpy()
     put_symbol = put_options["symbol"].to_numpy()
+    put_bid = put_options["bid"].to_numpy()
+    put_ask = put_options["ask"].to_numpy()
 
     try:
         if scatter == "interest" or scatter == "unusual":
@@ -72,8 +76,13 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
 
             call_annotations = call_volumes
             call_annotations2 = call_interest
+            call_annotations3 = call_bid
+            call_annotations4 = call_ask
+
             put_annotations = put_volumes
             put_annotations2 = put_interest
+            put_annotations3 = put_bid
+            put_annotations4 = put_ask
 
             c1 = call_volumes ** 0.2
             c2 = put_volumes ** 0.2
@@ -95,8 +104,13 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
 
             call_annotations = call_interest
             call_annotations2 = call_volumes
+            call_annotations3 = call_bid
+            call_annotations4 = call_ask
+
             put_annotations = put_interest
             put_annotations2 = put_volumes
+            put_annotations3 = put_bid
+            put_annotations4 = put_ask
 
             c1 = call_interest ** 0.2
             c2 = put_interest ** 0.2
@@ -133,26 +147,31 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             put_dates = put_dates[put_filter_index]
             put_strikes = put_strikes[put_filter_index]
 
-            call_annotations = np.round(call_V_OI, 3)
-            call_annotations2 = call_volumes[call_filter_index]
-            call_annotations3 = call_interest[call_filter_index]
-
-            put_annotations = np.round(put_V_OI, 3)
-            put_annotations2 = put_volumes[put_filter_index]
-            put_annotations3 = put_interest[put_filter_index]
-
-            c1 = call_V_OI ** 0.2
-            c2 = put_V_OI ** 0.2
-
-            call_symbol = call_symbol[call_filter_index]
-            put_symbol = put_symbol[put_filter_index]
-
             call_total = (
                 "V: {:,}".format(call_volumes.sum()) + " " + "OI: {:,}".format(call_interest.sum())
             )
             put_total = (
                 "V: {:,}".format(put_volumes.sum()) + " " + "OI: {:,}".format(put_interest.sum())
             )
+
+            c1 = call_V_OI ** 0.2
+            c2 = put_V_OI ** 0.2
+
+            call_V_OI = np.round(call_V_OI, 3)
+            call_volumes = call_volumes[call_filter_index]
+            call_interest = call_interest[call_filter_index]
+            call_bid = call_bid[put_filter_index]
+            call_ask = call_ask[put_filter_index]
+
+            put_V_OI = np.round(put_V_OI, 3)
+            put_volumes = put_volumes[put_filter_index]
+            put_interest = put_interest[put_filter_index]
+            put_bid = put_bid[put_filter_index]
+            put_ask = put_ask[put_filter_index]
+
+            call_symbol = call_symbol[call_filter_index]
+            put_symbol = put_symbol[put_filter_index]
+
             scatter_title = "Unusual Options"
 
         # Setup the figure for two subplots, one for calls, one for puts
@@ -200,8 +219,11 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
         calls.set_title("Calls - Total {}: {}".format(scatter_title, call_total), fontsize=9)
         puts.set_title("Puts - Total {}: {}".format(scatter_title, put_total), fontsize=9)
 
+        calls.get_yaxis().set_major_formatter(ticker.FormatStrFormatter("$%1.0f"))
+        puts.get_yaxis().set_major_formatter(ticker.FormatStrFormatter("$%1.0f"))
+
         # Setup the calls and puts annotation box
-        annot1 = calls.annotate(
+        call_annot = calls.annotate(
             "",
             xy=(0, 0),
             xytext=(-65, 20),
@@ -209,7 +231,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             bbox=dict(boxstyle="round", fc="w"),
             arrowprops=dict(arrowstyle="fancy"),
         )
-        annot2 = puts.annotate(
+        put_annot = puts.annotate(
             "",
             xy=(0, 0),
             xytext=(-65, 20),
@@ -217,18 +239,19 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             bbox=dict(boxstyle="round", fc="w"),
             arrowprops=dict(arrowstyle="fancy"),
         )
-        annot1.set_visible(False)
-        annot2.set_visible(False)
+        call_annot.set_visible(False)
+        put_annot.set_visible(False)
 
-        def update_annot1(ind):
+        def update_call_annot(ind):
             if scatter == "volume":
                 index = ind["ind"][:4]
                 text1 = "{}".format(
                     "\n".join(
                         str(call_symbol[n].split("_")[1])
                         + ": "
-                        + "Vol: {:,}".format(call_annotations[n])
-                        + " OI: {:,}".format(call_annotations2[n])
+                        + "Vol: {:,}, OI: {:,}, bid: \${:,}, ask: \${:,}".format(
+                            call_volumes[n], call_interest[n], call_bid[n], call_ask[n]
+                        )
                         for n in index
                     )
                 )
@@ -238,8 +261,9 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                     "\n".join(
                         str(call_symbol[n].split("_")[1])
                         + ": "
-                        + "OI: {:,}".format(call_annotations[n])
-                        + " Vol: {:,}".format(call_annotations2[n])
+                        + "OI: {:,}, Vol: {:,}, bid: \${:,}, ask: \${:,}".format(
+                            call_interest[n], call_volumes[n], call_bid[n], call_ask[n],
+                        )
                         for n in index
                     )
                 )
@@ -249,27 +273,33 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                     "\n".join(
                         str(call_symbol[n].split("_")[1])
                         + ": "
-                        + "V/OI: {:,}, V: {:,}, OI: {:,}".format(
-                            call_annotations[n], call_annotations2[n], call_annotations3[n]
+                        + "V/OI: {:,}, V: {:,}, OI: {:,}, bid: \${:,}, ask: \${:,}".format(
+                            call_V_OI[n],
+                            call_volumes[n],
+                            call_interest[n],
+                            call_bid[n],
+                            call_ask[n],
                         )
                         for n in index
                     )
                 )
-            pos1 = sc1.get_offsets()[ind["ind"][0]]
-            annot1.xy = pos1
-            annot1.set_text(text1)
-            annot1.get_bbox_patch().set_facecolor(cmap1(norm(c1[ind["ind"][0]])))
-            annot1.get_bbox_patch().set_alpha(0.8)
+            index = ind["ind"][:4]
+            pos1 = sc1.get_offsets()[index[0]]
+            call_annot.xy = pos1
+            call_annot.set_text(text1)
+            call_annot.get_bbox_patch().set_facecolor(cmap1(norm(c1[ind["ind"][0]])))
+            call_annot.get_bbox_patch().set_alpha(1)
 
-        def update_annot2(ind):
+        def update_put_annot(ind):
             if scatter == "volume":
                 index = ind["ind"][:4]
                 text2 = "{}".format(
                     "\n".join(
                         str(put_symbol[n].split("_")[1])
                         + ": "
-                        + "Vol: {:,}".format(put_annotations[n])
-                        + " OI: {:,}".format(put_annotations2[n])
+                        + "Vol: {:,}, OI: {:,}, bid: \${:,}, ask: \${:,}".format(
+                            put_volumes[n], put_interest[n], put_bid[n], put_ask[n],
+                        )
                         for n in index
                     )
                 )
@@ -279,8 +309,9 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                     "\n".join(
                         str(put_symbol[n].split("_")[1])
                         + ": "
-                        + "OI: {:,}".format(put_annotations[n])
-                        + " Vol: {:,}".format(put_annotations2[n])
+                        + "OI: {:,}, Vol: {:,}, bid: \${:,}, ask: \${:,}".format(
+                            put_interest[n], put_volumes[n], put_bid[n], put_ask[n],
+                        )
                         for n in index
                     )
                 )
@@ -290,42 +321,44 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                     "\n".join(
                         str(put_symbol[n].split("_")[1])
                         + ": "
-                        + "V/OI: {:,}, V: {:,}, OI: {:,}".format(
-                            put_annotations[n], put_annotations2[n], put_annotations3[n]
+                        + "V/OI: {:,}, V: {:,}, OI: {:,}, bid: \${:,}, ask: \${:,}".format(
+                            put_V_OI[n], put_volumes[n], put_interest[n], put_bid[n], put_ask[n],
                         )
                         for n in index
                     )
                 )
 
-            pos2 = sc2.get_offsets()[ind["ind"][0]]
-            annot2.xy = pos2
-            annot2.set_text(text2)
-            annot2.get_bbox_patch().set_facecolor(cmap2(norm(c2[ind["ind"][0]])))
-            annot2.get_bbox_patch().set_alpha(0.8)
+            index = ind["ind"][:4]
+            pos2 = sc2.get_offsets()[index[0]]
+
+            put_annot.xy = pos2
+            put_annot.set_text(text2)
+            put_annot.get_bbox_patch().set_facecolor(cmap2(norm(c2[ind["ind"][0]])))
+            put_annot.get_bbox_patch().set_alpha(1)
 
         def hover(event):
-            vis = annot1.get_visible()
+            vis = call_annot.get_visible()
             if event.inaxes == calls.axes:
                 cont, ind1 = sc1.contains(event)
                 if cont:
-                    update_annot1(ind1)
-                    annot1.set_visible(True)
+                    update_call_annot(ind1)
+                    call_annot.set_visible(True)
                     fig.canvas.draw_idle()
                 else:
                     if vis:
-                        annot1.set_visible(False)
+                        call_annot.set_visible(False)
                         fig.canvas.draw_idle()
 
-            vis = annot2.get_visible()
+            vis = put_annot.get_visible()
             if event.inaxes == puts.axes:
                 cont, ind2 = sc2.contains(event)
                 if cont:
-                    update_annot2(ind2)
-                    annot2.set_visible(True)
+                    update_put_annot(ind2)
+                    put_annot.set_visible(True)
                     fig.canvas.draw_idle()
                 else:
                     if vis:
-                        annot2.set_visible(False)
+                        put_annot.set_visible(False)
                         fig.canvas.draw_idle()
 
         fig.canvas.mpl_connect("motion_notify_event", hover)

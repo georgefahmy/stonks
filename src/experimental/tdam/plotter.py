@@ -9,15 +9,10 @@ SEC_PER_HOUR = 3600
 HOURS_TO_DISPLAY = 0.5
 SECONDS_TO_LIMIT = SEC_PER_HOUR * HOURS_TO_DISPLAY
 
-FIG_WIDTH = 6.34
+FIG_WIDTH = 6.36
 STD_FIG_HEIGHT = 5
-PRICE_WIDTH = 6.34
-PRICE_HEIGHT = 2.55
-
-
-def moving_average(x, N=3):
-    cumsum = np.cumsum(np.insert(x, 0, 0))
-    return (cumsum[N:] - cumsum[:-N]) / float(N)
+PRICE_WIDTH = 6.36
+PRICE_HEIGHT = 2.45
 
 
 def detailed_plotter(
@@ -69,7 +64,7 @@ def detailed_plotter(
     if delay is None:
         delay = 60
     else:
-        delay = round(int(delay))
+        delay = float(delay)
 
     if line1 == []:
         # this is the call to matplotlib that allows dynamic plotting
@@ -83,8 +78,7 @@ def detailed_plotter(
         totals2 = totals.twinx()  # two y axes on the second subplot
         price = axs[2]
         volume = price.twinx()
-        average = axs[2]
-        width = timedelta(seconds=delay / 3)
+        width = timedelta(seconds=delay / 2)
         volume_width = timedelta(seconds=(delay * 0.9))
 
         (line1,) = diffs.bar(
@@ -172,9 +166,9 @@ def detailed_plotter(
 
     # after the figure, axis, and line are created, we need to update the y-data
     for line, data, color, calls in bar_list:
-        width = timedelta(seconds=(delay / 3))
+        width = timedelta(seconds=(delay / 2))
         if limit:
-            num_values_to_keep = round(int(SECONDS_TO_LIMIT / delay))
+            num_values_to_keep = int(SECONDS_TO_LIMIT / delay)
             x_data = x_data[-num_values_to_keep:]
             data = data[-num_values_to_keep:]
 
@@ -197,7 +191,8 @@ def detailed_plotter(
 
     for line, data, total, title, bar in line_data_list:
         if limit:
-            num_values_to_keep = int(SECONDS_TO_LIMIT / int(delay))
+
+            num_values_to_keep = int(SECONDS_TO_LIMIT / delay)
             x_data = x_data[-num_values_to_keep:]
             data = data[-num_values_to_keep:]
 
@@ -233,7 +228,7 @@ def detailed_plotter(
 
         if bar:
             volume = line.axes
-            volume_width = timedelta(seconds=(delay * 0.9))
+            volume_width = timedelta(seconds=(delay * 0.95))
             volume.cla()
             volume.set_ylim(bottom=0)
             volume.set_ylabel("Volume", fontsize=10)
@@ -288,7 +283,7 @@ def price_plotter(
     plt.style.use("ggplot")
     plt.ion()
     rcParams["toolbar"] = "None"
-    width = timedelta(seconds=(delay * 0.9))
+    width = timedelta(seconds=(delay * 0.95))
     if fig_size is None:
         fig_width = PRICE_WIDTH
         fig_height = PRICE_HEIGHT
@@ -304,7 +299,7 @@ def price_plotter(
     if delay is None:
         delay = 60
     else:
-        delay = round(int(delay))
+        delay = float(delay)
 
     if line5 == []:
         # this is the call to matplotlib that allows dynamic plotting
@@ -367,9 +362,10 @@ def price_plotter(
     price.get_yaxis().set_major_formatter(ticker.FormatStrFormatter("$%1.2f"))
     price.set_yticks(np.linspace(round(price.get_ylim()[0], 2), round(price.get_ylim()[1], 2), 5))
 
-    width = timedelta(seconds=(delay * 0.9))
+    width = timedelta(seconds=(delay * 0.95))
     volume.cla()
     volume.set_ylim(bottom=0)
+    volume.set_ylabel("Volume", fontsize=10)
     volume.get_yaxis().set_major_formatter(ticker.StrMethodFormatter("{x:,.0f}"))
     volume.bar(x_data, volume_data, width, color="black", alpha=0.2, label="Volume")
     volume.set_yticks(np.linspace(0, line6.axes.get_ylim()[1] + 1, 5))

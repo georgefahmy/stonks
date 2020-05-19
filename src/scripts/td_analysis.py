@@ -53,7 +53,11 @@ def get_arg_parser():
         "-t", "--target", type=float, help="Plots a horizontal line at the target price.",
     )
     arg_parser.add_argument(
-        "-d", "--delay", type=int, default=60, help="Plots a horizontal line at the target price.",
+        "-d",
+        "--delay",
+        type=float,
+        default=60,
+        help="Plots a horizontal line at the target price.",
     )
     arg_parser.add_argument(
         "-s",
@@ -105,14 +109,19 @@ def td_plot(symbol, target, limit, price_only, delay, scatter):
     else:
         while True:
             iteration_start = datetime.now()
-            options = tdclient.optionsDF(symbol)
-            quote = tdclient.quoteDF(symbol)
-            stock_name = quote["description"].values[0]
+            try:
+                options = tdclient.optionsDF(symbol)
+                quote = tdclient.quoteDF(symbol)
+                stock_name = quote["description"].values[0]
+            except:
+                stock_name = symbol
+                continue
 
             # Debug purposes
             if False:
                 # pprint(options.head(1).to_dict())
                 pprint(quote.head(1).to_dict())
+
             try:
                 quote_timestamp = int(str(quote["quoteTimeInLong"].to_list()[0])[:-3])
                 quote_date = datetime.fromtimestamp(quote_timestamp).replace(microsecond=0)
@@ -158,6 +167,10 @@ def td_plot(symbol, target, limit, price_only, delay, scatter):
             y6_data.append(volume_diff)
 
             iteration_duration = datetime.now() - iteration_start
+
+            if delay < iteration_duration.total_seconds():
+                delay = iteration_duration.total_seconds()
+
             sleep(max([delay - iteration_duration.total_seconds(), 1]))
 
             if price_only:
