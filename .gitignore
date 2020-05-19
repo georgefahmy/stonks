@@ -3,3 +3,5 @@ tickers*
 __pycache__
 *egg-info*
 *stock*
+keys.json
+tdameritrade/

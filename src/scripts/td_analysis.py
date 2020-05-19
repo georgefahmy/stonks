@@ -17,8 +17,8 @@ import tdameritrade
 
 from matplotlib import pyplot as plt, rcParams
 from tdameritrade import auth, TDClient
-from plotter import detailed_plotter, price_plotter
-from scatter_plot import scatter_plot
+from experimental.tdam.plotter import detailed_plotter, price_plotter
+from experimental.tdam.scatter_plot import scatter_plot
 
 # TODO Add multi threading. one thread to gather the data for a stock and store it in a DataFrame
 # TODO a second thread to plot that data as it is being streamed
@@ -63,11 +63,7 @@ def get_arg_parser():
         help="Generates an instantanious snapshot of all option positions and volumes",
     )
     arg_parser.add_argument(
-        "-l",
-        "--limit",
-        action="store_false",
-        default=True,
-        help="Limit the size of the array to 200 values",
+        "-l", "--limit", action="store_false", default=True, help="Dont limit the plotting window",
     )
 
     return arg_parser

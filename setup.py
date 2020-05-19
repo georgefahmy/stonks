@@ -8,7 +8,7 @@ with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
 
 setuptools.setup(
     name="stonks",
-    version="1.0.2",
+    version="1.0.3",
     author="georgefahmy",
     author_email="geofahm@gmail.com",
     description="Generate a report or stream live stocks from wallstreetbets",
@@ -31,6 +31,7 @@ setuptools.setup(
         "yahoo-fin==0.8.4",
         "pandas==1.0.2",
         "better-profanity==0.6.1",
+        "matplotlib==3.2.1",
     ],
     classifiers=["Programming Language :: Python :: 3", "Programming Language :: Python :: 3.7",],
     entry_points={
@@ -39,6 +40,7 @@ setuptools.setup(
             "wsb_report = scripts.wsb_report:main",
             "all_stream = scripts.all_stream:main",
             "get_symbols = utils.get_symbols:main",
+            "td_analysis = scripts.td_analysis:main",
         ]
     },
 )

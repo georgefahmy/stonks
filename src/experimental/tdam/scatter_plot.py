@@ -222,26 +222,29 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
 
         def update_annot1(ind):
             if scatter == "volume":
+                index = ind["ind"][:4]
                 text1 = "{}".format(
                     "\n".join(
                         str(call_symbol[n].split("_")[1])
                         + ": "
                         + "Vol: {:,}".format(call_annotations[n])
                         + " OI: {:,}".format(call_annotations2[n])
-                        for n in ind["ind"]
+                        for n in index
                     )
                 )
             elif scatter == "interest":
+                index = ind["ind"][:4]
                 text1 = "{}".format(
                     "\n".join(
                         str(call_symbol[n].split("_")[1])
                         + ": "
                         + "OI: {:,}".format(call_annotations[n])
                         + " Vol: {:,}".format(call_annotations2[n])
-                        for n in ind["ind"]
+                        for n in index
                     )
                 )
             elif scatter == "unusual":
+                index = ind["ind"][:4]
                 text1 = "{}".format(
                     "\n".join(
                         str(call_symbol[n].split("_")[1])
@@ -249,7 +252,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         + "V/OI: {:,}, V: {:,}, OI: {:,}".format(
                             call_annotations[n], call_annotations2[n], call_annotations3[n]
                         )
-                        for n in ind["ind"]
+                        for n in index
                     )
                 )
             pos1 = sc1.get_offsets()[ind["ind"][0]]
@@ -260,26 +263,29 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
 
         def update_annot2(ind):
             if scatter == "volume":
+                index = ind["ind"][:4]
                 text2 = "{}".format(
                     "\n".join(
                         str(put_symbol[n].split("_")[1])
                         + ": "
                         + "Vol: {:,}".format(put_annotations[n])
                         + " OI: {:,}".format(put_annotations2[n])
-                        for n in ind["ind"]
+                        for n in index
                     )
                 )
             elif scatter == "interest":
+                index = ind["ind"][:4]
                 text2 = "{}".format(
                     "\n".join(
                         str(put_symbol[n].split("_")[1])
                         + ": "
                         + "OI: {:,}".format(put_annotations[n])
                         + " Vol: {:,}".format(put_annotations2[n])
-                        for n in ind["ind"]
+                        for n in index
                     )
                 )
             elif scatter == "unusual":
+                index = ind["ind"][:4]
                 text2 = "{}".format(
                     "\n".join(
                         str(put_symbol[n].split("_")[1])
@@ -287,7 +293,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         + "V/OI: {:,}, V: {:,}, OI: {:,}".format(
                             put_annotations[n], put_annotations2[n], put_annotations3[n]
                         )
-                        for n in ind["ind"]
+                        for n in index
                     )
                 )
 

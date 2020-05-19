@@ -6,3 +6,5 @@ yahoo-fin==0.8.4
 requests-html==0.10.0
 pandas==1.0.2
 better-profanity==0.6.1
+matplotlib==3.2.1
+git+https://github.com/timkpaine/tdameritrade.git@abc5dab5cec8b4426e59065c435f136a625a3c3f#egg=tdameritrade
