@@ -15,6 +15,11 @@ PRICE_WIDTH = 6.34
 PRICE_HEIGHT = 2.55
 
 
+def moving_average(x, N=3):
+    cumsum = np.cumsum(np.insert(x, 0, 0))
+    return (cumsum[N:] - cumsum[:-N]) / float(N)
+
+
 def detailed_plotter(
     tdclient,
     symbol,
@@ -25,11 +30,13 @@ def detailed_plotter(
     line3,
     line4,
     line5,
+    line6,
     y1_data,
     y2_data,
     y3_data,
     y4_data,
     y5_data,
+    y6_data,
     percent_change="",
     target=None,
     xlabel=None,
@@ -75,7 +82,10 @@ def detailed_plotter(
         totals = axs[1]
         totals2 = totals.twinx()  # two y axes on the second subplot
         price = axs[2]
+        volume = price.twinx()
+        average = axs[2]
         width = timedelta(seconds=delay / 3)
+        volume_width = timedelta(seconds=(delay * 0.9))
 
         (line1,) = diffs.bar(
             np.array(x_data), y1_data, width, align="edge", color=color1, alpha=0.8, label=label1
@@ -86,6 +96,10 @@ def detailed_plotter(
         (line3,) = totals.plot(x_data, y3_data, color=color1, alpha=0.8)
         (line4,) = totals2.plot(x_data, y4_data, color=color2, alpha=0.8)
         (line5,) = price.plot(x_data, np.round(y5_data, 3), color=color3, alpha=0.8, label="Price")
+        (line6,) = volume.bar(
+            x_data, y6_data, volume_width, color="black", alpha=0.2, label="Volume"
+        )
+
         if target:
             line5.axes.axhline(target, 0, 1, color=color4, linestyle="dashed", label="Target")
 
@@ -93,6 +107,9 @@ def detailed_plotter(
         diffs.set_ylabel("Volume", fontsize=10)
         diffs.tick_params(axis="y", labelsize=8)
         diffs.set_xticklabels([])
+        diffs.get_yaxis().set_major_formatter(ticker.StrMethodFormatter("{x:,.0f}"))
+
+        # diffs.set_yscale("log")
 
         totals.set_ylabel("Total Calls", fontsize=10)
         totals.get_yaxis().set_major_formatter(ticker.StrMethodFormatter("{x:,.0f}"))
@@ -111,6 +128,11 @@ def detailed_plotter(
         price.get_yaxis().get_major_formatter().set_useOffset(False)
         price.get_yaxis().set_major_formatter(ticker.FormatStrFormatter("$%1.2f"))
 
+        volume.grid(None)
+        volume.tick_params(axis="y", labelsize=7)
+        volume.set_ylabel("Volume", fontsize=10)
+        volume.set_yticks(np.linspace(0, volume.get_ylim()[1] + 1, 5))
+
         fig.autofmt_xdate()
         fig.legend(loc="upper right", fontsize=7)
         plt.autoscale(axis="y", tight=True)
@@ -121,20 +143,23 @@ def detailed_plotter(
         else:
             plt.show(block=True)
     # createe list of tuple information for use in for loops later
+    # line, y_data, color, calls
     bar_list = [
         (line1, y1_data, color1, True),
         (line2, y2_data, color2, False),
     ]
+    # line, y_data, color label, title info, bar
     line_data_list = [
-        (line3, y3_data, True, True),
-        (line4, y4_data, True, False),
-        (line5, y5_data, False, False),
+        (line3, y3_data, True, True, False),
+        (line4, y4_data, True, False, False),
+        (line5, y5_data, False, False, False),
+        (line6, y6_data, False, False, True),
     ]
     plt.suptitle(
-        "{} ({}) Options: {} ({}%)".format(
+        "{} ({}): ${} ({}%)".format(
             stock_name, symbol, np.round(y5_data[-1], 3), round(percent_change, 2)
         ),
-        fontsize=12,
+        fontsize=10,
         y=0.98,
     )
     plt.tight_layout(pad=1.0, h_pad=2.0)
@@ -154,6 +179,8 @@ def detailed_plotter(
             data = data[-num_values_to_keep:]
 
         if calls:
+            line.axes.clear()
+            line.axes.set_ylabel("Volume", fontsize=10)
             line.axes.set_xticklabels([])
             line.axes.bar(
                 x_data, data, -width, align="edge", color=color, alpha=0.8, label=label1,
@@ -161,8 +188,6 @@ def detailed_plotter(
             line.axes.autoscale_view(scalex=True)
 
         else:
-            line.axes.clear()
-            line.axes.set_ylabel("Volume", fontsize=10)
 
             line.axes.set_xticklabels([])
             line.axes.bar(
@@ -170,15 +195,32 @@ def detailed_plotter(
             )
             line.axes.autoscale_view(scalex=True)
 
-    for line, data, total, title in line_data_list:
+    for line, data, total, title, bar in line_data_list:
         if limit:
             num_values_to_keep = int(SECONDS_TO_LIMIT / int(delay))
             x_data = x_data[-num_values_to_keep:]
             data = data[-num_values_to_keep:]
 
-        line.set_data(x_data, data)
-        line.axes.relim()
-        line.axes.autoscale_view(scalex=True)
+        if not bar:
+            line.set_data(x_data, data)
+            line.axes.relim()
+            line.axes.autoscale_view(scalex=True)
+
+            # adjust limits if new data goes beyond bounds
+            if np.min(data) <= line.axes.get_ylim()[0] or np.max(data) >= line.axes.get_ylim()[1]:
+                if np.min(data) == np.max(data):
+                    plt.ylim([np.min(data) - 1, np.max(data) + 1])
+                    if total:
+                        line.axes.set_yticks(
+                            np.linspace(line.axes.get_ybound()[0], line.axes.get_ybound()[1], 5)
+                        )
+                else:
+                    plt.ylim([np.min(data) - np.std(data), np.max(data) + np.std(data)])
+                    if total:
+                        line.axes.set_yticks(
+                            np.linspace(line.axes.get_ybound()[0], line.axes.get_ybound()[1], 5)
+                        )
+
         if title:
             line.axes.set_title(
                 "Total Call Volume: {:,} - Total Put Volume: {:,}".format(y3_data[-1], y4_data[-1]),
@@ -189,20 +231,29 @@ def detailed_plotter(
                 np.linspace(line.axes.get_ybound()[0], line.axes.get_ybound()[1], 5)
             )
 
-        # adjust limits if new data goes beyond bounds
-        if np.min(data) <= line.axes.get_ylim()[0] or np.max(data) >= line.axes.get_ylim()[1]:
-            if np.min(data) == np.max(data):
-                plt.ylim([np.min(data) - 1, np.max(data) + 1])
-                if total:
-                    line.axes.set_yticks(
-                        np.linspace(line.axes.get_ybound()[0], line.axes.get_ybound()[1], 5)
-                    )
+        if bar:
+            volume = line.axes
+            volume_width = timedelta(seconds=(delay * 0.9))
+            volume.cla()
+            volume.set_ylim(bottom=0)
+            volume.set_ylabel("Volume", fontsize=10)
+            volume.get_yaxis().set_major_formatter(ticker.StrMethodFormatter("{x:,.0f}"))
+            volume.bar(x_data, data, volume_width, color="black", alpha=0.2, label="Volume")
+            volume.set_yticks(np.linspace(0, line6.axes.get_ylim()[1] + 1, 5))
+            volume.grid(None)
+
+            if np.max(data) >= volume.get_ylim()[1]:
+                volume.set_ylim([0, np.max(data) + np.std(data)])
+                volume.set_yticks(np.linspace(0, volume.get_ylim()[1] + 1, 5))
+
             else:
-                plt.ylim([np.min(data) - np.std(data), np.max(data) + np.std(data)])
-                if total:
-                    line.axes.set_yticks(
-                        np.linspace(line.axes.get_ybound()[0], line.axes.get_ybound()[1], 5)
-                    )
+                if np.min(data) == np.max(data):
+                    volume.set_ylim([0, np.max(data) + 1])
+                    volume.set_yticks(np.linspace(0, volume.get_ylim()[1] + 1, 5))
+
+                else:
+                    volume.set_ylim([0, np.max(data) + np.std(data)])
+                    volume.set_yticks(np.linspace(0, volume.get_ylim()[1] + 1, 5))
 
     # this pauses the data so the figure/axis can catch up - the amount of pause can be altered above
     plt.pause(pause_time)
@@ -211,7 +262,7 @@ def detailed_plotter(
         plt.show(block=True)
 
     # return line so we can update it again in the next iteration
-    return (line1, line2, line3, line4, line5)
+    return (line1, line2, line3, line4, line5, line6)
 
 
 def price_plotter(

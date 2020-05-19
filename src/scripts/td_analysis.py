@@ -97,6 +97,7 @@ def td_plot(symbol, target, limit, price_only, delay, scatter):
     line4 = []  # Put volume line
     line5 = []  # Price Line
     line6 = []  # Volume Line
+    line7 = []  # Moving Average of Price
 
     if scatter is not None:
         scatter_plot(tdclient, symbol, scatter)
@@ -173,7 +174,7 @@ def td_plot(symbol, target, limit, price_only, delay, scatter):
                     percent_change=percent_change,
                 )
             else:
-                line1, line2, line3, line4, line5 = detailed_plotter(
+                line1, line2, line3, line4, line5, line6 = detailed_plotter(
                     tdclient,
                     symbol,
                     stock_name,
@@ -183,11 +184,13 @@ def td_plot(symbol, target, limit, price_only, delay, scatter):
                     line3,
                     line4,
                     line5,
+                    line6,
                     y1_data,
                     y2_data,
                     y3_data,
                     y4_data,
                     y5_data,
+                    y6_data,
                     percent_change=percent_change,
                     color1="g",
                     color2="r",
