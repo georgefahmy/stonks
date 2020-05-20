@@ -39,9 +39,11 @@ def get_arg_parser():
     arg_parser = ArgumentParser(
         description="""Detailed analysis of stocks and options using the tdameritrade api."""
     )
+
     arg_parser.add_argument(
         "symbol", type=str.upper, help="Stock symbol to analyze",
     )
+
     arg_parser.add_argument(
         "-p",
         "--price-only",
@@ -49,9 +51,11 @@ def get_arg_parser():
         default=False,
         help="Plots a horizontal line at the target price.",
     )
+
     arg_parser.add_argument(
         "-t", "--target", type=float, help="Plots a horizontal line at the target price.",
     )
+
     arg_parser.add_argument(
         "-d",
         "--delay",
@@ -59,6 +63,15 @@ def get_arg_parser():
         default=60,
         help="Plots a horizontal line at the target price.",
     )
+
+    arg_parser.add_argument(
+        "-hh",
+        "--hours",
+        type=float,
+        default=0.5,
+        help="Optional flag for number of hours to limit the plot to display.",
+    )
+
     arg_parser.add_argument(
         "-s",
         "--scatter",
@@ -66,6 +79,7 @@ def get_arg_parser():
         default=None,
         help="Generates an instantanious snapshot of all option positions and volumes",
     )
+
     arg_parser.add_argument(
         "-l", "--limit", action="store_false", default=True, help="Dont limit the plotting window",
     )
@@ -82,7 +96,7 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def td_plot(symbol, target, limit, price_only, delay, scatter):
+def td_plot(symbol, target, limit, price_only, delay, hours, scatter):
     first = True
 
     # Initialize all the plot lists
@@ -113,6 +127,9 @@ def td_plot(symbol, target, limit, price_only, delay, scatter):
                 options = tdclient.optionsDF(symbol)
                 quote = tdclient.quoteDF(symbol)
                 stock_name = quote["description"].values[0]
+
+                if len(stock_name) >= 50:
+                    stock_name = stock_name[:50]
             except:
                 stock_name = symbol
                 continue
@@ -184,6 +201,7 @@ def td_plot(symbol, target, limit, price_only, delay, scatter):
                     y5_data,
                     y6_data,
                     delay=delay,
+                    hours=hours,
                     percent_change=percent_change,
                 )
             else:
@@ -213,6 +231,7 @@ def td_plot(symbol, target, limit, price_only, delay, scatter):
                     limit=limit,
                     target=target,
                     delay=delay,
+                    hours=hours,
                 )
 
             if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
@@ -251,11 +270,13 @@ def td_plot(symbol, target, limit, price_only, delay, scatter):
                     line_data[2],
                     line_data[3],
                     line_data[4],
+                    line_data[5],
                     y_data[0],
                     y_data[1],
                     y_data[2],
                     y_data[3],
                     y_data[4],
+                    y_data[5],
                     color1="g",
                     color2="r",
                     color3="k",
@@ -272,7 +293,9 @@ def td_plot(symbol, target, limit, price_only, delay, scatter):
 def main(*args):
     args = parse_args(args)
 
-    td_plot(args.symbol, args.target, args.limit, args.price_only, args.delay, args.scatter)
+    td_plot(
+        args.symbol, args.target, args.limit, args.price_only, args.delay, args.hours, args.scatter
+    )
 
 
 if __name__ == "__main__":

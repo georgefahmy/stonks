@@ -6,8 +6,7 @@ from matplotlib import pyplot as plt, rcParams, ticker
 from datetime import timedelta
 
 SEC_PER_HOUR = 3600
-HOURS_TO_DISPLAY = 0.5
-SECONDS_TO_LIMIT = SEC_PER_HOUR * HOURS_TO_DISPLAY
+DEFAULT_HOURS_TO_DISPLAY = 0.5
 
 FIG_WIDTH = 6.36
 STD_FIG_HEIGHT = 5
@@ -47,6 +46,7 @@ def detailed_plotter(
     limit=True,
     live=True,
     delay=None,
+    hours=None,
     pause_time=0.1,
 ):
     plt.style.use("ggplot")
@@ -66,6 +66,11 @@ def detailed_plotter(
     else:
         delay = float(delay)
 
+    if hours is None:
+        seconds_to_limit = SEC_PER_HOUR * DEFAULT_HOURS_TO_DISPLAY
+    else:
+        seconds_to_limit = SEC_PER_HOUR * hours
+
     if line1 == []:
         # this is the call to matplotlib that allows dynamic plotting
         fig, axs = plt.subplots(3, figsize=(FIG_WIDTH, STD_FIG_HEIGHT))
@@ -78,7 +83,7 @@ def detailed_plotter(
         totals2 = totals.twinx()  # two y axes on the second subplot
         price = axs[2]
         volume = price.twinx()
-        width = timedelta(seconds=delay / 2)
+        width = timedelta(seconds=delay / 2.5)
         volume_width = timedelta(seconds=(delay * 0.9))
 
         (line1,) = diffs.bar(
@@ -166,9 +171,9 @@ def detailed_plotter(
 
     # after the figure, axis, and line are created, we need to update the y-data
     for line, data, color, calls in bar_list:
-        width = timedelta(seconds=(delay / 2))
+        width = timedelta(seconds=(delay / 2.5))
         if limit:
-            num_values_to_keep = int(SECONDS_TO_LIMIT / delay)
+            num_values_to_keep = int(seconds_to_limit / delay)
             x_data = x_data[-num_values_to_keep:]
             data = data[-num_values_to_keep:]
 
@@ -177,7 +182,14 @@ def detailed_plotter(
             line.axes.set_ylabel("Volume", fontsize=10)
             line.axes.set_xticklabels([])
             line.axes.bar(
-                x_data, data, -width, align="edge", color=color, alpha=0.8, label=label1,
+                x_data,
+                data,
+                -width,
+                align="edge",
+                color=color,
+                edgecolors="black",
+                alpha=0.8,
+                label=label1,
             )
             line.axes.autoscale_view(scalex=True)
 
@@ -185,14 +197,21 @@ def detailed_plotter(
 
             line.axes.set_xticklabels([])
             line.axes.bar(
-                x_data, data, width, align="edge", color=color, alpha=0.8, label=label1,
+                x_data,
+                data,
+                width,
+                align="edge",
+                color=color,
+                edgecolors="black",
+                alpha=0.8,
+                label=label1,
             )
             line.axes.autoscale_view(scalex=True)
 
     for line, data, total, title, bar in line_data_list:
         if limit:
 
-            num_values_to_keep = int(SECONDS_TO_LIMIT / delay)
+            num_values_to_keep = int(seconds_to_limit / delay)
             x_data = x_data[-num_values_to_keep:]
             data = data[-num_values_to_keep:]
 
@@ -233,7 +252,15 @@ def detailed_plotter(
             volume.set_ylim(bottom=0)
             volume.set_ylabel("Volume", fontsize=10)
             volume.get_yaxis().set_major_formatter(ticker.StrMethodFormatter("{x:,.0f}"))
-            volume.bar(x_data, data, volume_width, color="black", alpha=0.2, label="Volume")
+            volume.bar(
+                x_data,
+                data,
+                volume_width,
+                color="black",
+                edgecolors="black",
+                alpha=0.2,
+                label="Volume",
+            )
             volume.set_yticks(np.linspace(0, line6.axes.get_ylim()[1] + 1, 5))
             volume.grid(None)
 
@@ -279,6 +306,7 @@ def price_plotter(
     fig_size=None,
     live=True,
     delay=None,
+    hours=None,
 ):
     plt.style.use("ggplot")
     plt.ion()
@@ -300,6 +328,12 @@ def price_plotter(
         delay = 60
     else:
         delay = float(delay)
+
+    if hours is None:
+        hours = HOURS_TO_DISPLAY
+        seconds_to_limit = SEC_PER_HOUR * hours
+    else:
+        seconds_to_limit = SEC_PER_HOUR * hours
 
     if line5 == []:
         # this is the call to matplotlib that allows dynamic plotting
@@ -348,7 +382,7 @@ def price_plotter(
     )
     # after the figure, axis, and line are created, we need to update the y-data
     if limit:
-        num_values_to_keep = int(SECONDS_TO_LIMIT / int(delay))
+        num_values_to_keep = int(seconds_to_limit / int(delay))
         x_data = x_data[-num_values_to_keep:]
         price_data = price_data[-num_values_to_keep:]
         volume_data = volume_data[-num_values_to_keep:]
