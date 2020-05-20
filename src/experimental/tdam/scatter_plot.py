@@ -61,7 +61,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                 valid = False
             else:
                 valid = True
-        elif scatter == "volume":
+        elif scatter == "volume" or scatter == "bidask":
             valid = True
     except:
         valid = False
@@ -173,6 +173,37 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             put_symbol = put_symbol[put_filter_index]
 
             scatter_title = "Unusual Options"
+        elif scatter == "bidask":
+            call_filter_index = call_volumes > 0
+            put_filter_index = put_volumes > 0
+
+            call_dates = call_dates[call_filter_index]
+            call_strikes = call_strikes[call_filter_index]
+            call_volumes = call_volumes[call_filter_index]
+            call_ask = call_ask[call_filter_index]
+            call_bid = call_bid[call_filter_index]
+
+            put_dates = put_dates[put_filter_index]
+            put_strikes = put_strikes[put_filter_index]
+            put_volumes = put_volumes[put_filter_index]
+            put_ask = put_ask[put_filter_index]
+            put_bid = put_bid[put_filter_index]
+
+            call_spread = np.round(call_ask - call_bid, 2)
+            put_spread = np.round(put_ask - put_bid, 2)
+
+            max_norm = max([max(call_ask - call_bid), max(put_ask - put_bid)])
+
+            call_markers = ((call_spread - min(call_spread)) / (max_norm - min(call_spread))) * 300
+            put_markers = ((put_spread - min(put_spread)) / (max_norm - min(put_spread))) * 300
+
+            c1 = call_spread ** 0.2
+            c2 = put_spread ** 0.2
+
+            call_total = "{:,}".format(call_volumes.sum())
+            put_total = "{:,}".format(put_volumes.sum())
+
+            scatter_title = "Volume"
 
         # Setup the figure for two subplots, one for calls, one for puts
         plt.style.use("ggplot")
@@ -283,6 +314,18 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         for n in index
                     )
                 )
+            elif scatter == "bidask":
+                index = ind["ind"][:2]
+                text1 = "{}".format(
+                    "\n".join(
+                        str(call_symbol[n].split("_")[1])
+                        + ": "
+                        + "BidAsk: \${:,.2f}, Vol: {:,}, bid: \${:,}, ask: \${:,}".format(
+                            call_spread[n], call_volumes[n], call_bid[n], call_ask[n]
+                        )
+                        for n in index
+                    )
+                )
             index = ind["ind"][:4]
             pos1 = sc1.get_offsets()[index[0]]
             call_annot.xy = pos1
@@ -327,7 +370,18 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         for n in index
                     )
                 )
-
+            elif scatter == "bidask":
+                index = ind["ind"][:4]
+                text2 = "{}".format(
+                    "\n".join(
+                        str(put_symbol[n].split("_")[1])
+                        + ": "
+                        + "BidAsk: \${:,.2f}, Vol: {:,}, bid: \${:,}, ask: \${:,}".format(
+                            put_spread[n], put_volumes[n], put_bid[n], put_ask[n]
+                        )
+                        for n in index
+                    )
+                )
             index = ind["ind"][:4]
             pos2 = sc2.get_offsets()[index[0]]
 
