@@ -273,9 +273,35 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
         call_annot.set_visible(False)
         put_annot.set_visible(False)
 
+        def annote_adjuster(axes, pos):
+            ylims = axes.get_ylim()
+            range_y = ylims[1] - ylims[0]
+
+            mid_y = (ylims[1] + ylims[0]) / 2
+
+            if pos[1] >= mid_y:
+                y = -40
+            else:
+                y = 20
+
+            xlims = axes.get_xlim()
+            range_x = xlims[1] - xlims[0]
+
+            mid_x = (xlims[1] + xlims[0]) / 2 - (range_x * 0.1)
+            # mid_x = (xlims[1] - xlims[0]) / 2 + xlims[0]
+            max_x = (xlims[1] + xlims[0]) / 2 + (range_x * 0.25)
+
+            if pos[0] >= max_x:
+                x = -range_x / 2.5
+            elif max_x > pos[0] >= mid_x:
+                x = -range_x / 5
+            else:
+                x = 0
+            return (x, y)
+
         def update_call_annot(ind):
             if scatter == "volume":
-                index = ind["ind"][:4]
+                index = ind["ind"][:3]
                 text1 = "{}".format(
                     "\n".join(
                         str(call_symbol[n].split("_")[1])
@@ -287,7 +313,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                     )
                 )
             elif scatter == "interest":
-                index = ind["ind"][:4]
+                index = ind["ind"][:3]
                 text1 = "{}".format(
                     "\n".join(
                         str(call_symbol[n].split("_")[1])
@@ -299,7 +325,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                     )
                 )
             elif scatter == "unusual":
-                index = ind["ind"][:4]
+                index = ind["ind"][:3]
                 text1 = "{}".format(
                     "\n".join(
                         str(call_symbol[n].split("_")[1])
@@ -315,7 +341,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                     )
                 )
             elif scatter == "bidask":
-                index = ind["ind"][:2]
+                index = ind["ind"][:3]
                 text1 = "{}".format(
                     "\n".join(
                         str(call_symbol[n].split("_")[1])
@@ -326,9 +352,10 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         for n in index
                     )
                 )
-            index = ind["ind"][:4]
+            index = ind["ind"][:3]
             pos1 = sc1.get_offsets()[index[0]]
             call_annot.xy = pos1
+            call_annot.set_position(annote_adjuster(sc1.axes, pos1))
             call_annot.set_text(text1)
             call_annot.get_bbox_patch().set_facecolor(cmap1(norm(c1[ind["ind"][0]])))
             call_annot.get_bbox_patch().set_alpha(1)
@@ -347,7 +374,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                     )
                 )
             elif scatter == "interest":
-                index = ind["ind"][:4]
+                index = ind["ind"][:3]
                 text2 = "{}".format(
                     "\n".join(
                         str(put_symbol[n].split("_")[1])
@@ -359,7 +386,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                     )
                 )
             elif scatter == "unusual":
-                index = ind["ind"][:4]
+                index = ind["ind"][:3]
                 text2 = "{}".format(
                     "\n".join(
                         str(put_symbol[n].split("_")[1])
@@ -371,7 +398,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                     )
                 )
             elif scatter == "bidask":
-                index = ind["ind"][:4]
+                index = ind["ind"][:3]
                 text2 = "{}".format(
                     "\n".join(
                         str(put_symbol[n].split("_")[1])
@@ -382,10 +409,35 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         for n in index
                     )
                 )
-            index = ind["ind"][:4]
+            index = ind["ind"][:3]
             pos2 = sc2.get_offsets()[index[0]]
 
+            # ylims2 = sc2.axes.get_ylim()
+            # range_y = ylims2[1] - ylims2[0]
+            # adjustment_y = range_y * 0.1
+            # mid_y = (ylims2[1] + ylims2[0]) / 2
+            # if pos2[1] >= mid_y:
+            #     y = -40
+            # else:
+            #     y = 20
+            #
+            # xlims2 = sc2.axes.get_xlim()
+            # range_x = xlims2[1] - xlims2[0]
+            #
+            # adjustment1_x = range_x * 0.1
+            # adjustment2_x = range_x * 0.25
+            # mid_x = (xlims2[1] + xlims2[0]) / 2 - adjustment1_x
+            # max_x = (xlims2[1] + xlims2[0]) / 2 + adjustment2_x
+            #
+            # if pos2[0] >= max_x:
+            #     x = -range_x / 3
+            # elif max_x > pos2[0] >= mid_x:
+            #     x = -range_x / 5
+            # else:
+            #     x = 0
+
             put_annot.xy = pos2
+            put_annot.set_position(annote_adjuster(sc2.axes, pos2))
             put_annot.set_text(text2)
             put_annot.get_bbox_patch().set_facecolor(cmap2(norm(c2[ind["ind"][0]])))
             put_annot.get_bbox_patch().set_alpha(1)
