@@ -155,16 +155,18 @@ def main(*args):
     else:
         sub_string = "wallstreetbets"
         logger.info("Getting WallStreetBets comments stream...")
-
-    stream = (
-        Reddit(
-            client_id="vRhMbe_s-60osQ",
-            client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
-            user_agent="extraction by /u/wsb-scraper",
+    try:
+        stream = (
+            Reddit(
+                client_id="vRhMbe_s-60osQ",
+                client_secret="cY4m1vwXkv9p0p3Lyz-4RM3-CrA",
+                user_agent="extraction by /u/wsb-scraper",
+            )
+            .subreddit(sub_string)
+            .stream.comments(skip_existing=True)
         )
-        .subreddit(sub_string)
-        .stream.comments(skip_existing=True)
-    )
+    except RedditAPIException as exception:
+        logger.error(exception)
 
     if parsed.link:
         logger.info("link flag set: will provide links in printout")
@@ -176,77 +178,85 @@ def main(*args):
         logger.info("No-Price flag set. Price information will be turned off.")
 
     logger.info("Starting stream!")
+    try:
+        for comment in stream:
+            if comment.author in ["TickerBaby", "AutoModerator"]:
+                continue
 
-    for comment in stream:
-        if comment.author in ["TickerBaby", "AutoModerator"]:
-            continue
+            logger.debug(comment)
+            caps_list = scrape_for_caps(comment.body)
+            logger.debug(caps_list)
+            if caps_list:
+                ticker_list = check_ticker(caps_list, DEFAULT_IGNORE_LIST)
+                logger.debug(ticker_list)
+                if ticker_list:
 
-        logger.debug(comment)
-        caps_list = scrape_for_caps(comment.body)
-        logger.debug(caps_list)
-        if caps_list:
-            ticker_list = check_ticker(caps_list, DEFAULT_IGNORE_LIST)
-            logger.debug(ticker_list)
-            if ticker_list:
+                    if parsed.censor:
+                        comment_body = profanity.censor(comment.body)
 
-                if parsed.censor:
-                    comment_body = profanity.censor(comment.body)
+                    else:
+                        comment_body = comment.body
 
-                else:
-                    comment_body = comment.body
-
-                print(
-                    "\n-----{}-----\n[{}] Comment by: /u/{} in /r/{}\n{}\n".format(
-                        comment.submission.title,
-                        datetime.now(),
-                        comment.author,
-                        comment.subreddit,
-                        comment_body,
+                    print(
+                        "\n-----{}-----\n[{}] Comment by: /u/{} in /r/{}\n{}\n".format(
+                            comment.submission.title,
+                            datetime.now(),
+                            comment.author,
+                            comment.subreddit,
+                            comment_body,
+                        )
                     )
-                )
-                if len(list(set(ticker_list))) == 1:
-                    print("{} stock Found:".format(len(list(set(ticker_list)))))
+                    if len(list(set(ticker_list))) == 1:
+                        print("{} stock Found:".format(len(list(set(ticker_list)))))
 
-                elif len(list(set(ticker_list))) > 20:
-                    print("{} stocks Found, truncated list:".format(len(list(set(ticker_list)))))
+                    elif len(list(set(ticker_list))) > 20:
+                        print(
+                            "{} stocks Found, truncated list:".format(len(list(set(ticker_list))))
+                        )
 
-                else:
-                    print("{} stocks Found:".format(len(list(set(ticker_list)))))
+                    else:
+                        print("{} stocks Found:".format(len(list(set(ticker_list)))))
 
-                for ticker in islice(
-                    list(set(ticker_list)), 0, min([len(list(set(ticker_list))), 20])
-                ):
-                    if parsed.no_price:
-                        price_string = ""
+                    for ticker in islice(
+                        list(set(ticker_list)), 0, min([len(list(set(ticker_list))), 20])
+                    ):
+                        if parsed.no_price:
+                            price_string = ""
 
-                    elif not parsed.no_price:
-                        try:
-                            live_price = round(si.get_live_price(ticker), 3)
-                            ticker_table = si.get_quote_table(ticker)
-                            prev_close = round(ticker_table["Previous Close"], 3)
-                            ticker_prct = round(((live_price - prev_close) / prev_close * 100), 3)
-                            volume = round(ticker_table["Volume"])
+                        elif not parsed.no_price:
+                            try:
+                                live_price = round(si.get_live_price(ticker), 3)
+                                ticker_table = si.get_quote_table(ticker)
+                                prev_close = round(ticker_table["Previous Close"], 3)
+                                ticker_prct = round(
+                                    ((live_price - prev_close) / prev_close * 100), 3
+                                )
+                                volume = round(ticker_table["Volume"])
 
-                        except:
-                            logger.warning("Unable to retrieve Price Data")
-                            live_price = "--"
-                            ticker_prct = "--"
-                            volume = "--"
+                            except:
+                                logger.warning("Unable to retrieve Price Data")
+                                live_price = "--"
+                                ticker_prct = "--"
+                                volume = "--"
 
-                        price_string = "\nLast Price: ${} ({}%)".format(live_price, ticker_prct)
-                        if isinstance(volume, int):
-                            volume_string = "\nVolume: {:,}\n".format(volume)
-                        else:
-                            volume_string = "\nVolume: {}\n".format(volume)
+                            price_string = "\nLast Price: ${} ({}%)".format(live_price, ticker_prct)
+                            if isinstance(volume, int):
+                                volume_string = "\nVolume: {:,}\n".format(volume)
+                            else:
+                                volume_string = "\nVolume: {}\n".format(volume)
 
-                    print("[{}] {}".format(ticker, symbols[ticker]) + price_string + volume_string)
+                        print(
+                            "[{}] {}".format(ticker, symbols[ticker]) + price_string + volume_string
+                        )
 
-                if parsed.sentiment:
-                    print("Comment sentiment: {}".format(get_sentiment(comment.body)))
+                    if parsed.sentiment:
+                        print("Comment sentiment: {}".format(get_sentiment(comment.body)))
 
-                if parsed.link:
-                    comment_link = "www.reddit.com" + str(comment.permalink)
-                    print("Link: {}\n".format(make_tiny(comment_link)))
+                    if parsed.link:
+                        comment_link = "www.reddit.com" + str(comment.permalink)
+                        print("Link: {}\n".format(make_tiny(comment_link)))
+    except REdditAPIException as exception:
+        print(exception)
 
     # TODO add check for volume of options purchased, open interest to check trends of stock interest.
     # TODO add a check for puts or calls (puts, calls, p, c) in the comment to help with sentiment.

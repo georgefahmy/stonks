@@ -8,7 +8,7 @@ with open(os.path.join(here, "README.md"), encoding="utf-8") as f:
 
 setuptools.setup(
     name="stonks",
-    version="1.0.3",
+    version="1.0.4",
     author="georgefahmy",
     author_email="geofahm@gmail.com",
     description="Generate a report or stream live stocks from wallstreetbets",
@@ -23,7 +23,7 @@ setuptools.setup(
     python_requires=">=3.6",
     setup_requires=[],
     install_requires=[
-        "praw==6.5.1",
+        "praw==7.0.0",
         "textblob==0.15.3",
         "robin-stocks==0.9.9.6",
         "pytz==2019.3",
