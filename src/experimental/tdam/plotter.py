@@ -182,14 +182,7 @@ def detailed_plotter(
             line.axes.set_ylabel("Volume", fontsize=10)
             line.axes.set_xticklabels([])
             line.axes.bar(
-                x_data,
-                data,
-                -width,
-                align="edge",
-                color=color,
-                edgecolors="black",
-                alpha=0.8,
-                label=label1,
+                x_data, data, -width, align="edge", color=color, alpha=0.8, label=label1,
             )
             line.axes.autoscale_view(scalex=True)
 
@@ -197,14 +190,7 @@ def detailed_plotter(
 
             line.axes.set_xticklabels([])
             line.axes.bar(
-                x_data,
-                data,
-                width,
-                align="edge",
-                color=color,
-                edgecolors="black",
-                alpha=0.8,
-                label=label1,
+                x_data, data, width, align="edge", color=color, alpha=0.8, label=label1,
             )
             line.axes.autoscale_view(scalex=True)
 
@@ -253,13 +239,7 @@ def detailed_plotter(
             volume.set_ylabel("Volume", fontsize=10)
             volume.get_yaxis().set_major_formatter(ticker.StrMethodFormatter("{x:,.0f}"))
             volume.bar(
-                x_data,
-                data,
-                volume_width,
-                color="black",
-                edgecolors="black",
-                alpha=0.2,
-                label="Volume",
+                x_data, data, volume_width, color="black", alpha=0.2, label="Volume",
             )
             volume.set_yticks(np.linspace(0, line6.axes.get_ylim()[1] + 1, 5))
             volume.grid(None)
@@ -330,8 +310,7 @@ def price_plotter(
         delay = float(delay)
 
     if hours is None:
-        hours = HOURS_TO_DISPLAY
-        seconds_to_limit = SEC_PER_HOUR * hours
+        seconds_to_limit = SEC_PER_HOUR * DEFAULT_HOURS_TO_DISPLAY
     else:
         seconds_to_limit = SEC_PER_HOUR * hours
 
