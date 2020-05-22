@@ -31,6 +31,7 @@ import yahoo_fin.options as oi
 from argparse import ArgumentParser
 from pathlib import Path
 from praw import Reddit
+from praw.exceptions import RedditAPIException
 from better_profanity import profanity
 from utils.ignore import DEFAULT_IGNORE_LIST
 from utils.common import check_ticker, get_sentiment, scrape_for_caps
@@ -254,9 +255,13 @@ def main(*args):
 
                     if parsed.link:
                         comment_link = "www.reddit.com" + str(comment.permalink)
-                        print("Link: {}\n".format(make_tiny(comment_link)))
-    except REdditAPIException as exception:
-        print(exception)
+                        try:
+                            print("Link: {}\n".format(make_tiny(comment_link)))
+                        except:
+                            print("Link: {}\n".format(comment_link))
+
+    except RedditAPIException as exception:
+        logger.error(exception)
 
     # TODO add check for volume of options purchased, open interest to check trends of stock interest.
     # TODO add a check for puts or calls (puts, calls, p, c) in the comment to help with sentiment.

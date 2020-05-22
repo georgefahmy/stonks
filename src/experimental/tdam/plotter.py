@@ -31,7 +31,7 @@ def detailed_plotter(
     y4_data,
     y5_data,
     y6_data,
-    percent_change="",
+    percent_change=None,
     target=None,
     xlabel=None,
     label1=None,
@@ -70,6 +70,15 @@ def detailed_plotter(
         seconds_to_limit = SEC_PER_HOUR * DEFAULT_HOURS_TO_DISPLAY
     else:
         seconds_to_limit = SEC_PER_HOUR * hours
+
+    if percent_change is None:
+        percent_change = ""
+    else:
+        percent_change = round(percent_change, 2)
+        if percent_change >= 0:
+            perc_color = "green"
+        else:
+            perc_color = "red"
 
     if line1 == []:
         # this is the call to matplotlib that allows dynamic plotting
@@ -147,12 +156,12 @@ def detailed_plotter(
         (line1, y1_data, color1, True),
         (line2, y2_data, color2, False),
     ]
-    # line, y_data, color label, title info, bar
+    # line, y_data, color label, title info, bar, price
     line_data_list = [
-        (line3, y3_data, True, True, False),
-        (line4, y4_data, True, False, False),
-        (line5, y5_data, False, False, False),
-        (line6, y6_data, False, False, True),
+        (line3, y3_data, True, True, False, False),
+        (line4, y4_data, True, False, False, False),
+        (line5, y5_data, False, False, False, True),
+        (line6, y6_data, False, False, True, False),
     ]
     plt.suptitle(
         "{} ({}): ${} ({}%)".format(
@@ -194,15 +203,35 @@ def detailed_plotter(
             )
             line.axes.autoscale_view(scalex=True)
 
-    for line, data, total, title, bar in line_data_list:
+    for line, data, total, title, bar, price in line_data_list:
         if limit:
 
             num_values_to_keep = int(seconds_to_limit / delay)
             x_data = x_data[-num_values_to_keep:]
             data = data[-num_values_to_keep:]
 
-        if not bar:
+        if not bar and not price:
             line.set_data(x_data, data)
+            line.axes.relim()
+            line.axes.autoscale_view(scalex=True)
+
+            # adjust limits if new data goes beyond bounds
+            if np.min(data) <= line.axes.get_ylim()[0] or np.max(data) >= line.axes.get_ylim()[1]:
+                if np.min(data) == np.max(data):
+                    plt.ylim([np.min(data) - 1, np.max(data) + 1])
+                    if total:
+                        line.axes.set_yticks(
+                            np.linspace(line.axes.get_ybound()[0], line.axes.get_ybound()[1], 5)
+                        )
+                else:
+                    plt.ylim([np.min(data) - np.std(data), np.max(data) + np.std(data)])
+                    if total:
+                        line.axes.set_yticks(
+                            np.linspace(line.axes.get_ybound()[0], line.axes.get_ybound()[1], 5)
+                        )
+        if price:
+            line.set_data(x_data, data)
+            line.set_color(perc_color)
             line.axes.relim()
             line.axes.autoscale_view(scalex=True)
 
@@ -303,6 +332,10 @@ def price_plotter(
         percent_change = ""
     else:
         percent_change = round(percent_change, 2)
+        if percent_change >= 0:
+            perc_color = "green"
+        else:
+            perc_color = "red"
 
     if delay is None:
         delay = 60
@@ -369,6 +402,7 @@ def price_plotter(
     price = line5.axes
     volume = line6.axes
     line5.set_data(x_data, np.round(price_data, 2))
+    line5.set_color(perc_color)
 
     price.relim()
     price.autoscale_view(scalex=True)

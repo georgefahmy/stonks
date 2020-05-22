@@ -98,6 +98,7 @@ def parse_args(args):
 
 def td_plot(symbol, target, limit, price_only, delay, hours, scatter):
     first = True
+    original_delay = delay
 
     # Initialize all the plot lists
     x_data = []  # dates
@@ -128,8 +129,8 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter):
                 quote = tdclient.quoteDF(symbol)
                 stock_name = quote["description"].values[0]
 
-                if len(stock_name) >= 50:
-                    stock_name = stock_name[:50]
+                if len(stock_name) >= 40:
+                    stock_name = stock_name[:40]
             except:
                 stock_name = symbol
                 continue
@@ -186,7 +187,9 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter):
             iteration_duration = datetime.now() - iteration_start
 
             if delay < iteration_duration.total_seconds():
-                delay = iteration_duration.total_seconds()
+                delay = 2 * iteration_duration.total_seconds()
+            else:
+                delay = original_delay
 
             sleep(max([delay - iteration_duration.total_seconds(), 1]))
 

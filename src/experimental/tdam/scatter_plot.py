@@ -76,8 +76,8 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             ) * 300
             put_markers = ((put_volumes - min(put_volumes)) / (max_norm - min(put_volumes))) * 300
 
-            c1 = call_markers ** 0.2
-            c2 = put_markers ** 0.2
+            c1 = call_markers ** 0.3
+            c2 = put_markers ** 0.3
 
             call_total = "{:,}".format(call_volumes.sum())
             put_total = "{:,}".format(put_volumes.sum())
@@ -179,7 +179,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             call_markers = ((call_spread - min(call_spread)) / (max_norm - min(call_spread))) * 300
             put_markers = ((put_spread - min(put_spread)) / (max_norm - min(put_spread))) * 300
 
-            c1 = call_markersd ** 0.2
+            c1 = call_markers ** 0.2
             c2 = put_markers ** 0.2
 
             call_total = "{:,}".format(call_volumes.sum())
@@ -241,7 +241,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             xy=(0, 0),
             xytext=(-65, 20),
             textcoords=("axes fraction", "offset points"),
-            bbox=dict(boxstyle="round", fc="w", alpha=0.5),
+            bbox=dict(boxstyle="round", fc="w"),
             arrowprops=dict(
                 arrowstyle="fancy", ec="black", connectionstyle="angle3,angleA=0,angleB=-90",
             ),
@@ -251,7 +251,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             xy=(0, 0),
             xytext=(-65, 20),
             textcoords=("axes fraction", "offset points"),
-            bbox=dict(boxstyle="round", fc="w", alpha=0.5),
+            bbox=dict(boxstyle="round", fc="w"),
             arrowprops=dict(
                 arrowstyle="fancy", ec="black", connectionstyle="angle3,angleA=0,angleB=-90",
             ),
@@ -347,7 +347,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             x, y = annote_adjuster(sc1.axes, pos1)
             call_annot.set_position((x, y))
             call_annot.set_text(text1)
-            call_annot.get_bbox_patch().set_facecolor(cmap1(norm(c1[ind["ind"][0]])))
+            call_annot.get_bbox_patch().set_facecolor(cmap1(norm(c1[index[0]])))
             call_annot.get_bbox_patch().set_alpha(0.85)
 
         def update_put_annot(ind):
@@ -405,7 +405,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             put_annot.xy = pos2
             put_annot.set_position(annote_adjuster(sc2.axes, pos2))
             put_annot.set_text(text2)
-            put_annot.get_bbox_patch().set_facecolor(cmap2(norm(c2[ind["ind"][0]])))
+            put_annot.get_bbox_patch().set_facecolor(cmap2(norm(c2[index[0]])))
             put_annot.get_bbox_patch().set_alpha(0.85)
 
         def hover(event):
