@@ -18,6 +18,7 @@ import os
 import pytz
 import re
 import sys
+import signal
 
 
 from datetime import datetime
@@ -37,7 +38,6 @@ from utils.ignore import DEFAULT_IGNORE_LIST
 from utils.common import check_ticker, get_sentiment, scrape_for_caps
 from utils.url_shortener import make_tiny
 
-
 # Logger
 logger = logging.getLogger(__name__)
 
@@ -55,6 +55,18 @@ logger.info("generating Symbols list")
 symbols = {}
 for line in [line.rstrip("\n") for line in open(TICKERS)]:
     symbols[line.split("|")[0]] = line.split("|")[1]
+
+
+class TimeoutException(Exception):  # Custom exception class
+    pass
+
+
+def timeout_handler(signum, frame):  # Custom signal handler
+    raise TimeoutException
+
+
+# Change the behavior of SIGALRM
+signal.signal(signal.SIGALRM, timeout_handler)
 
 
 def get_arg_parser():
@@ -225,6 +237,7 @@ def main(*args):
                             price_string = ""
 
                         elif not parsed.no_price:
+                            signal.alarm(10)
                             try:
                                 live_price = round(si.get_live_price(ticker), 3)
                                 ticker_table = si.get_quote_table(ticker)
@@ -234,12 +247,15 @@ def main(*args):
                                 )
                                 volume = round(ticker_table["Volume"])
 
-                            except:
+                            except TimeoutException:
                                 logger.warning("Unable to retrieve Price Data")
                                 live_price = "--"
                                 ticker_prct = "--"
                                 volume = "--"
 
+                            else:
+                                # Reset the alarm
+                                signal.alarm(0)
                             price_string = "\nLast Price: ${} ({}%)".format(live_price, ticker_prct)
                             if isinstance(volume, int):
                                 volume_string = "\nVolume: {:,}\n".format(volume)

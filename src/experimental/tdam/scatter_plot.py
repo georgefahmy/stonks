@@ -56,20 +56,20 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
     put_ask = put_options["ask"].to_numpy()
 
     try:
-        if scatter == "interest" or scatter == "unusual":
+        if scatter in ["interest", "i", "unusual", "u"]:
             max_call_interest = max(call_interest)
             max_put_interest = max(put_interest)
             if max_call_interest == 0 or max_put_interest == 0:
                 valid = False
             else:
                 valid = True
-        elif scatter == "volume" or scatter == "bidask":
+        elif scatter in ["volume", "v", "bidask", "b", "both"]:
             valid = True
     except:
         valid = False
 
     if valid:
-        if scatter == "volume":
+        if scatter in ["volume", "v"]:
             max_norm = max([max(call_volumes), max(put_volumes)])
             call_markers = (
                 (call_volumes - min(call_volumes)) / (max_norm - min(call_volumes))
@@ -84,7 +84,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
 
             scatter_title = "Volume"
 
-        elif scatter == "interest":
+        elif scatter in ["interest", "i"]:
             max_norm = max([max(call_interest), max(put_interest)])
 
             call_markers = (
@@ -102,7 +102,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
 
             scatter_title = "Open Interest"
 
-        elif scatter == "unusual":
+        elif scatter in ["unusual", "u"]:
 
             try:
                 call_filter_index = call_interest > 50
@@ -155,7 +155,8 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             put_symbol = put_symbol[put_filter_index]
 
             scatter_title = "Unusual Options"
-        elif scatter == "bidask":
+
+        elif scatter in ["bidask", "b"]:
             call_filter_index = call_volumes > 0
             put_filter_index = put_volumes > 0
 
@@ -185,7 +186,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             call_total = "{:,}".format(call_volumes.sum())
             put_total = "{:,}".format(put_volumes.sum())
 
-            scatter_title = "Volume"
+            scatter_title = "BidAsk Spread"
 
         # Setup the figure for two subplots, one for calls, one for puts
         plt.style.use("ggplot")
@@ -288,7 +289,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             return (x, y)
 
         def update_call_annot(ind):
-            if scatter == "volume":
+            if scatter in ["volume", "v"]:
                 index = ind["ind"][:3]
                 text1 = "{}".format(
                     "\n".join(
@@ -300,7 +301,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         for n in index
                     )
                 )
-            elif scatter == "interest":
+            elif scatter in ["interest", "i"]:
                 index = ind["ind"][:3]
                 text1 = "{}".format(
                     "\n".join(
@@ -312,7 +313,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         for n in index
                     )
                 )
-            elif scatter == "unusual":
+            elif scatter in ["unusual", "u"]:
                 index = ind["ind"][:3]
 
                 text1 = "{}".format(
@@ -329,7 +330,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         for n in index
                     )
                 )
-            elif scatter == "bidask":
+            elif scatter in ["bidask", "b"]:
                 index = ind["ind"][:3]
                 text1 = "{}".format(
                     "\n".join(
@@ -351,7 +352,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
             call_annot.get_bbox_patch().set_alpha(0.85)
 
         def update_put_annot(ind):
-            if scatter == "volume":
+            if scatter in ["volume", "v"]:
                 index = ind["ind"][:3]
                 text2 = "{}".format(
                     "\n".join(
@@ -363,7 +364,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         for n in index
                     )
                 )
-            elif scatter == "interest":
+            elif scatter in ["interest", "i"]:
                 index = ind["ind"][:3]
                 text2 = "{}".format(
                     "\n".join(
@@ -375,7 +376,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         for n in index
                     )
                 )
-            elif scatter == "unusual":
+            elif scatter in ["unusual", "u"]:
                 index = ind["ind"][:3]
                 text2 = "{}".format(
                     "\n".join(
@@ -387,7 +388,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         for n in index
                     )
                 )
-            elif scatter == "bidask":
+            elif scatter in ["bidask", "b"]:
                 index = ind["ind"][:3]
                 text2 = "{}".format(
                     "\n".join(

@@ -75,7 +75,7 @@ def get_arg_parser():
     arg_parser.add_argument(
         "-s",
         "--scatter",
-        choices=["volume", "interest", "unusual", "bidask", "both"],
+        choices=["volume", "v", "interest", "i", "unusual", "u", "bidask", "b", "both"],
         default=None,
         help="Generates an instantanious snapshot of all option positions and volumes",
     )
