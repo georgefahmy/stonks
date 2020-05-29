@@ -236,6 +236,11 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
         calls.get_yaxis().set_major_formatter(ticker.FormatStrFormatter("$%1.0f"))
         puts.get_yaxis().set_major_formatter(ticker.FormatStrFormatter("$%1.0f"))
 
+        if calls.get_ylim()[0] < 0:
+            calls.set_ylim(bottom=0)
+        if puts.get_ylim()[0] < 0:
+            puts.set_ylim(bottom=0)
+
         # Setup the calls and puts annotation box
         call_annot = calls.annotate(
             "",

@@ -245,7 +245,10 @@ def main(*args):
                                 ticker_prct = round(
                                     ((live_price - prev_close) / prev_close * 100), 3
                                 )
-                                volume = round(ticker_table["Volume"])
+                                try:
+                                    volume = round(ticker_table["Volume"])
+                                except:
+                                    volume = 0
 
                             except TimeoutException:
                                 logger.warning("Unable to retrieve Price Data")
