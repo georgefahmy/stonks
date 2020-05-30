@@ -49,7 +49,7 @@ def get_arg_parser():
         "--price-only",
         action="store_true",
         default=False,
-        help="Plots a horizontal line at the target price.",
+        help="Only display the price and volume portion of the plots.",
     )
 
     arg_parser.add_argument(
@@ -61,7 +61,7 @@ def get_arg_parser():
         "--delay",
         type=float,
         default=60,
-        help="Plots a horizontal line at the target price.",
+        help="How often to update the plot. Default 60 seconds.",
     )
 
     arg_parser.add_argument(

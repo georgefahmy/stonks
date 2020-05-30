@@ -34,9 +34,9 @@ This is your trading account, not your developer account.
 
 ### td_analysis
 ```
-usage: td_analysis.py [-h] [-p] [-t TARGET] [-d DELAY]
-                      [-s {volume,interest,unusual,both}] [-l]
-                      symbol
+usage: td_analysis [-h] [-p] [-t TARGET] [-d DELAY] [-hh HOURS]
+                   [-s {volume,v,interest,i,unusual,u,bidask,b,both}] [-l]
+                   symbol
 
 Detailed analysis of stocks and options using the tdameritrade api.
 
@@ -45,12 +45,16 @@ positional arguments:
 
 optional arguments:
   -h, --help            show this help message and exit
-  -p, --price-only      Plots a horizontal line at the target price.
+  -p, --price-only      Only display the price and volume portion of the
+                        plots.
   -t TARGET, --target TARGET
                         Plots a horizontal line at the target price.
   -d DELAY, --delay DELAY
-                        Plots a horizontal line at the target price.
-  -s {volume,interest,unusual,both}, --scatter {volume,interest,unusual,both}
+                        How often to update the plot. Default 60 seconds.
+  -hh HOURS, --hours HOURS
+                        Optional flag for number of hours to limit the plot to
+                        display.
+  -s {volume,v,interest,i,unusual,u,bidask,b,both}, --scatter {volume,v,interest,i,unusual,u,bidask,b,both}
                         Generates an instantanious snapshot of all option
                         positions and volumes
   -l, --limit           Dont limit the plotting window
