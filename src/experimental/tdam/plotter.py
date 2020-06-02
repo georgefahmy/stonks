@@ -82,7 +82,7 @@ def detailed_plotter(
 
     if line1 == []:
         # this is the call to matplotlib that allows dynamic plotting
-        fig, axs = plt.subplots(3, figsize=(FIG_WIDTH, STD_FIG_HEIGHT))
+        fig, axs = plt.subplots(3, figsize=(fig_width, fig_height))
 
         # create a variable for the line so we can later update it
         diffs = axs[0]
@@ -349,7 +349,7 @@ def price_plotter(
 
     if line5 == []:
         # this is the call to matplotlib that allows dynamic plotting
-        fig, price = plt.subplots(1, figsize=(PRICE_WIDTH, PRICE_HEIGHT))
+        fig, price = plt.subplots(1, figsize=(fig_width, fig_height))
         volume = price.twinx()
         # create a variable for the line so we can later update it
         (line5,) = price.plot(

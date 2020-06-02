@@ -83,6 +83,14 @@ def get_arg_parser():
     arg_parser.add_argument(
         "-l", "--limit", action="store_false", default=True, help="Dont limit the plotting window",
     )
+    arg_parser.add_argument(
+        "-w",
+        "--window_size",
+        type=float,
+        nargs=2,
+        default=None,
+        help="provide optional window size for plots. width x height y",
+    )
 
     return arg_parser
 
@@ -96,7 +104,7 @@ def parse_args(args):
     return parser.parse_args(args)
 
 
-def td_plot(symbol, target, limit, price_only, delay, hours, scatter):
+def td_plot(symbol, target, limit, price_only, delay, hours, scatter, window_size):
     first = True
     original_delay = delay
 
@@ -206,6 +214,7 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter):
                     delay=delay,
                     hours=hours,
                     percent_change=percent_change,
+                    fig_size=window_size,
                 )
             else:
                 line1, line2, line3, line4, line5, line6 = detailed_plotter(
@@ -235,6 +244,7 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter):
                     target=target,
                     delay=delay,
                     hours=hours,
+                    fig_size=window_size,
                 )
 
             if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
@@ -297,7 +307,14 @@ def main(*args):
     args = parse_args(args)
 
     td_plot(
-        args.symbol, args.target, args.limit, args.price_only, args.delay, args.hours, args.scatter
+        args.symbol,
+        args.target,
+        args.limit,
+        args.price_only,
+        args.delay,
+        args.hours,
+        args.scatter,
+        args.window_size,
     )
 
 
