@@ -17,6 +17,7 @@ import tdameritrade
 
 from matplotlib import pyplot as plt, rcParams
 from tdameritrade import auth, TDClient
+from multiprocessing import Process
 from experimental.tdam.plotter import detailed_plotter, price_plotter
 from experimental.tdam.scatter_plot import scatter_plot
 
@@ -75,9 +76,21 @@ def get_arg_parser():
     arg_parser.add_argument(
         "-s",
         "--scatter",
-        choices=["volume", "v", "interest", "i", "unusual", "u", "bidask", "b", "both"],
+        choices=[
+            "volume",
+            "v",
+            "open_interest",
+            "interest",
+            "i",
+            "unusual",
+            "u",
+            "bidask",
+            "b",
+            "both",
+            "all",
+        ],
         default=None,
-        help="Generates an instantanious snapshot of all option positions and volumes",
+        help="Generates an instantanious snapshot of all option positions and volumes, options: volume, interest (open interest), unusual (volume/open_interest), bidask (bid/ask spread), both (volume and open_interest), all (volume, open interest, unusual options, bidask spread)",
     )
 
     arg_parser.add_argument(
@@ -127,7 +140,19 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter, window_siz
     line7 = []  # Moving Average of Price
 
     if scatter is not None:
-        scatter_plot(tdclient, symbol, scatter)
+        if scatter == "both":
+            scatter_plot(tdclient, symbol, "v", show=False)
+            scatter_plot(tdclient, symbol, "i")
+        if scatter == "all":
+            scatter_plot(tdclient, symbol, "v", show=False)
+            scatter_plot(tdclient, symbol, "i", show=False)
+            scatter_plot(tdclient, symbol, "u", show=False)
+            scatter_plot(
+                tdclient, symbol, "b",
+            )
+
+        else:
+            scatter_plot(tdclient, symbol, scatter)
 
     else:
         while True:

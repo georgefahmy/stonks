@@ -12,7 +12,7 @@ FIG_WIDTH = 6.33
 STD_FIG_HEIGHT = 5
 
 
-def scatter_plot(tdclient, symbol, scatter, fig_size=None):
+def scatter_plot(tdclient, symbol, scatter, fig_size=None, show=True):
     options = tdclient.optionsDF(symbol)
     quote = tdclient.quoteDF(symbol)
 
@@ -440,6 +440,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None):
                         fig.canvas.draw_idle()
 
         fig.canvas.mpl_connect("motion_notify_event", hover)
-        plt.show()
+        if show:
+            plt.show()
     else:
         print("Open_interest data invalid or missing...")
