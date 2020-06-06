@@ -17,7 +17,6 @@ import tdameritrade
 
 from matplotlib import pyplot as plt, rcParams
 from tdameritrade import auth, TDClient
-from multiprocessing import Process
 from experimental.tdam.plotter import detailed_plotter, price_plotter
 from experimental.tdam.scatter_plot import scatter_plot
 
@@ -147,9 +146,7 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter, window_siz
             scatter_plot(tdclient, symbol, "v", show=False)
             scatter_plot(tdclient, symbol, "i", show=False)
             scatter_plot(tdclient, symbol, "u", show=False)
-            scatter_plot(
-                tdclient, symbol, "b",
-            )
+            scatter_plot(tdclient, symbol, "b")
 
         else:
             scatter_plot(tdclient, symbol, scatter)
@@ -189,12 +186,16 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter, window_siz
             price = quote["lastPrice"].values[0]
             volume = quote["totalVolume"].values[0]
             percent_change = quote["netPercentChangeInDouble"].values[0]
+            lastclose = quote["closePrice"].values[0]
 
             calls = options[options["putCall"] == "CALL"]
             puts = options[options["putCall"] == "PUT"]
 
             call_volume = calls["totalVolume"].sum()
             put_volume = puts["totalVolume"].sum()
+
+            if target == 0:
+                target = lastclose
 
             if first:
                 prev_calls = call_volume
@@ -240,6 +241,7 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter, window_siz
                     hours=hours,
                     percent_change=percent_change,
                     fig_size=window_size,
+                    target=target,
                 )
             else:
                 line1, line2, line3, line4, line5, line6 = detailed_plotter(

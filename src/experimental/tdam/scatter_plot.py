@@ -12,7 +12,7 @@ FIG_WIDTH = 6.33
 STD_FIG_HEIGHT = 5
 
 
-def scatter_plot(tdclient, symbol, scatter, fig_size=None, show=True):
+def scatter_plot(tdclient, symbol, scatter, fig_size=None, pos=None, show=True):
     options = tdclient.optionsDF(symbol)
     quote = tdclient.quoteDF(symbol)
 
@@ -191,6 +191,8 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None, show=True):
         # Setup the figure for two subplots, one for calls, one for puts
         plt.style.use("ggplot")
         fig, axs = plt.subplots(2, figsize=(fig_width, fig_height))
+        # manager = plt.get_current_fig_manager()
+        pprint(fig.canvas.__dict__)
         norm = plt.Normalize(0, 1)
         cmap1 = plt.cm.ocean
         cmap2 = plt.cm.gist_earth
