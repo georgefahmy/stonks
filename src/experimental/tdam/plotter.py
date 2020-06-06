@@ -141,7 +141,7 @@ def detailed_plotter(
         volume.set_ylabel("Volume", fontsize=10)
         volume.set_yticks(np.linspace(0, volume.get_ylim()[1] + 1, 5))
 
-        fig.autofmt_xdate()
+        fig.autofmt_xdate(rotation=20)
         fig.legend(loc="upper right", fontsize=7)
         plt.autoscale(axis="y", tight=True)
         fig.tight_layout(pad=1.0, h_pad=2.0)
@@ -380,7 +380,7 @@ def price_plotter(
         plt.gca().autoscale(axis="x", tight=True)
         ax = plt.gca()
         ax.xaxis.set_major_locator(ticker.MultipleLocator(5))
-        fig.autofmt_xdate()
+        fig.autofmt_xdate(rotation=20)
         fig.tight_layout()
 
         if live:
