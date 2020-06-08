@@ -146,9 +146,7 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter, window_siz
             scatter_plot(tdclient, symbol, "v", show=False)
             scatter_plot(tdclient, symbol, "i", show=False)
             scatter_plot(tdclient, symbol, "u", show=False)
-            scatter_plot(
-                tdclient, symbol, "b",
-            )
+            scatter_plot(tdclient, symbol, "b")
 
         else:
             scatter_plot(tdclient, symbol, scatter)
