@@ -139,13 +139,13 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None, pos=None, show=True):
             c1 = call_markers ** 0.2
             c2 = put_markers ** 0.2
 
-            call_V_OI = np.round(call_V_OI, 3)
+            call_V_OI = np.round(call_V_OI, 2)
             call_volumes = call_volumes[call_filter_index]
             call_interest = call_interest[call_filter_index]
             call_bid = call_bid[call_filter_index]
             call_ask = call_ask[call_filter_index]
 
-            put_V_OI = np.round(put_V_OI, 3)
+            put_V_OI = np.round(put_V_OI, 2)
             put_volumes = put_volumes[put_filter_index]
             put_interest = put_interest[put_filter_index]
             put_bid = put_bid[put_filter_index]
@@ -192,7 +192,7 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None, pos=None, show=True):
         plt.style.use("ggplot")
         fig, axs = plt.subplots(2, figsize=(fig_width, fig_height))
         # manager = plt.get_current_fig_manager()
-        pprint(fig.canvas.__dict__)
+
         norm = plt.Normalize(0, 1)
         cmap1 = plt.cm.ocean
         cmap2 = plt.cm.gist_earth

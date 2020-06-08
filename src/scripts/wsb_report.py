@@ -47,11 +47,13 @@ def get_arg_parser():
         "type",
         help="""Choose which submissions to search: top, hot or new, If top, --type-flag is
             an optional flag to choose day, week, month, year, all""",
+        choices=["top", "hot", "new"],
     )
 
     arg_parser.add_argument(
         "--type-flag",
         default="day",
+        choices=["day", "week", "month"],
         help="enter the type of sorting for 'top': 'day, week, month'",
     )
 
@@ -62,7 +64,7 @@ def get_arg_parser():
     arg_parser.add_argument(
         "-c",
         "--comments",
-        default=10,
+        default=30,
         help="Enter the limit for how many comment pages to scrape. Default=10",
         type=int,
     )
@@ -70,7 +72,7 @@ def get_arg_parser():
     arg_parser.add_argument(
         "-p",
         "--print",
-        default=5,
+        default=10,
         help="Limit the number of stocks printed after scraping. Default=5",
         type=int,
     )
@@ -191,7 +193,8 @@ def print_top_count(wsb_ticker_list, frequency, parsed):
         top_string = ""
 
     print(
-        "\nConfiguration: Sorting {} {} submissions{} with comment depth of {} pages. Minimum submission score: {}. Minimum comment score: {}".format(
+        "\nConfiguration: Sorting {} {} submissions{} with comment depth of {} pages. \
+        Minimum submission score: {}. Minimum comment score: {}".format(
             parsed.submissions,
             str(parsed.type).capitalize(),
             top_string,
