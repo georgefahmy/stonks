@@ -19,6 +19,7 @@ import sys
 
 from argparse import ArgumentParser
 from collections import Counter
+from datetime import datetime
 
 # Extended Python #
 from pathlib import Path
@@ -216,7 +217,7 @@ def print_top_count(wsb_ticker_list, frequency, parsed):
 
 
 def main(*args):
-
+    start = datetime.now()
     parsed = parse_args(args)
 
     if parsed.debug:
@@ -276,6 +277,7 @@ def main(*args):
         pprint(wsb_ticker_list)
 
         # logger.warning("Invalid type selected")
+    logger.info("Program executed in: {}".format(datetime.now() - start))
 
 
 if __name__ == "__main__":
