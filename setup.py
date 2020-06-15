@@ -37,9 +37,11 @@ setuptools.setup(
     entry_points={
         "console_scripts": [
             "streamer = scripts.streamer:main",
+            "report = scripts.wsb_report:main",
             "wsb_report = scripts.wsb_report:main",
             "all_stream = scripts.all_stream:main",
             "get_symbols = utils.get_symbols:main",
+            "tda = scripts.td_analysis:main",
             "td_analysis = scripts.td_analysis:main",
         ]
     },
