@@ -186,6 +186,9 @@ def scatter_plot(tdclient, symbol, scatter, fig_size=None, pos=None, show=True):
             call_total = "{:,}".format(call_volumes.sum())
             put_total = "{:,}".format(put_volumes.sum())
 
+            call_symbol = call_symbol[call_filter_index]
+            put_symbol = put_symbol[put_filter_index]
+
             scatter_title = "BidAsk Spread"
 
         # Setup the figure for two subplots, one for calls, one for puts

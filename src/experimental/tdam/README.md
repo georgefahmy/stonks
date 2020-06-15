@@ -34,9 +34,10 @@ This is your trading account, not your developer account.
 
 ### td_analysis
 ```
-usage: td_analysis [-h] [-p] [-t TARGET] [-d DELAY] [-hh HOURS]
-                   [-s {volume,v,interest,i,unusual,u,bidask,b,both}] [-l]
-                   symbol
+usage: tda [-h] [-p] [-t TARGET] [-d DELAY] [-hh HOURS]
+           [-s {volume,v,open_interest,interest,i,unusual,u,bidask,b,both,all}]
+           [-l] [-w WINDOW_SIZE WINDOW_SIZE]
+           symbol
 
 Detailed analysis of stocks and options using the tdameritrade api.
 
@@ -54,8 +55,13 @@ optional arguments:
   -hh HOURS, --hours HOURS
                         Optional flag for number of hours to limit the plot to
                         display.
-  -s {volume,v,interest,i,unusual,u,bidask,b,both}, --scatter {volume,v,interest,i,unusual,u,bidask,b,both}
-                        Generates an instantanious snapshot of all option
-                        positions and volumes
+  -s, --scatter {volume,v,open_interest,interest,i,unusual,u,bidask,b,both,all}
+                        Generates an instantaneous snapshot of all option
+                        positions and volumes, options: volume, interest (open
+                        interest), unusual (volume/open_interest), bidask
+                        (bid/ask spread), both (volume and open_interest), all
+                        (volume, open interest, unusual options, bidask spread)
   -l, --limit           Dont limit the plotting window
+  -w WINDOW_SIZE WINDOW_SIZE, --window_size WINDOW_SIZE WINDOW_SIZE
+                        provide optional window size for plots. width x height y
   ```

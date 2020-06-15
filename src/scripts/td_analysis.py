@@ -89,7 +89,7 @@ def get_arg_parser():
             "all",
         ],
         default=None,
-        help="""Generates an instantanious snapshot of all option positions and volumes,
+        help="""Generates an instantaneous snapshot of all option positions and volumes,
         options: volume, interest (open interest), unusual (volume/open_interest),
         bidask (bid/ask spread), both (volume and open_interest),
         all (volume, open interest, unusual options, bidask spread)""",
@@ -149,9 +149,7 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter, window_siz
             scatter_plot(tdclient, symbol, "v", show=False)
             scatter_plot(tdclient, symbol, "i", show=False)
             scatter_plot(tdclient, symbol, "u", show=False)
-            scatter_plot(
-                tdclient, symbol, "b",
-            )
+            scatter_plot(tdclient, symbol, "b")
 
         else:
             scatter_plot(tdclient, symbol, scatter)
