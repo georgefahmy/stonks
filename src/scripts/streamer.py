@@ -257,6 +257,12 @@ def main(*args):
                                 ticker_prct = "--"
                                 volume = "--"
 
+                            except:
+                                logger.warning("Unable to retrieve Price Data")
+                                live_price = "--"
+                                ticker_prct = "--"
+                                volume = "--"
+
                             else:
                                 # Reset the alarm
                                 signal.alarm(0)
