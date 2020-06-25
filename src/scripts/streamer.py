@@ -192,6 +192,8 @@ def main(*args):
         logger.info("No-Price flag set. Price information will be turned off.")
 
     logger.info("Starting stream!")
+
+    signal.alarm(30)
     try:
         for comment in stream:
             if comment.author in ["TickerBaby", "AutoModerator"]:
@@ -238,7 +240,7 @@ def main(*args):
                             price_string = ""
 
                         elif not parsed.no_price:
-                            signal.alarm(10)
+                            signal.alarm(7)
                             try:
                                 live_price = round(si.get_live_price(ticker), 3)
                                 ticker_table = si.get_quote_table(ticker)
@@ -288,6 +290,10 @@ def main(*args):
 
     except RedditAPIException as exception:
         logger.error(exception)
+    else:
+        # Reset the alarm
+        logger.error("Timeout Reached")
+        signal.alarm(0)
 
     # TODO add check for volume of options purchased, open interest to check trends of stock interest.
     # TODO add a check for puts or calls (puts, calls, p, c) in the comment to help with sentiment.
