@@ -14,23 +14,20 @@ Once you have this chromedriver in your path you need to run the authentication 
 
 Set up the follow environment variables:
 ```export TDAMERITRADE_CLIENT_ID="<your client id>"
-export TDAMERITRADE_REFRESH_TOKEN="<your refresh token>"
 export REDIRECT_URI="<your redirect uri>"
 ```
 
-Open a python prompt and then run the following program:
+Once the environment variables are set from your TD Ameritrade developer account, run:
 ```
-import os
-from tdameritrade import auth
-
-client_id = os.getenv("TDAMERITRADE_CLIENT_ID")
-redirect_uri = os.getenv("REDIRECT_URI")
-
-auth.authentication(client_id=client_id, redirect_uri=redirect_uri)
-after giving access, hit enter to continue>
+python auth.py
 ```
+and follow the prompts.
+
 After this program runs it will open chrome and prompt you to log into your TDAmeritrade account.
 This is your trading account, not your developer account.
+
+After this is done, it will save the credentials file in the main folder and then write it as
+and environment variable.
 
 ### td_analysis
 ```

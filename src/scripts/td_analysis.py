@@ -2,6 +2,7 @@
 import logging
 import os
 import re
+import json
 import sys
 import select
 
@@ -16,7 +17,7 @@ import numpy as np
 import tdameritrade
 
 from matplotlib import pyplot as plt, rcParams
-from tdameritrade import auth, TDClient
+from tdameritrade import TDClient
 from experimental.tdam.plotter import detailed_plotter, price_plotter
 from experimental.tdam.scatter_plot import scatter_plot
 
@@ -24,11 +25,19 @@ from experimental.tdam.scatter_plot import scatter_plot
 # TODO a second thread to plot that data as it is being streamed
 # TODO a third thread potentially to plot the full data set.
 
-# REDIRECT_URI = "http://localhost:8080"
+REDIRECT_URI = "http://localhost:8080"
+
 CLIENT_ID = os.getenv("TDAMERITRADE_CLIENT_ID")
 REFRESH_TOKEN = os.getenv("TDAMERITRADE_REFRESH_TOKEN")
+CREDENTIALS_PATH = os.getenv("CREDENTIALS_PATH")
 
-tdclient = TDClient(client_id=CLIENT_ID, refresh_token=REFRESH_TOKEN)
+credentials = json.load(open(CREDENTIALS_PATH, "r"))
+
+tdclient = TDClient(
+    client_id=CLIENT_ID,
+    refresh_token=credentials["refresh_token"],
+    account_ids=credentials["access_token"],
+)
 
 
 def get_arg_parser():
@@ -57,11 +66,7 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
-        "-d",
-        "--delay",
-        type=float,
-        default=60,
-        help="How often to update the plot. Default 60 seconds.",
+        "-d", "--delay", type=float, default=60, help="How often to update the plot. Default 60s.",
     )
 
     arg_parser.add_argument(
@@ -69,7 +74,7 @@ def get_arg_parser():
         "--hours",
         type=float,
         default=0.5,
-        help="Optional flag for number of hours to limit the plot to display.",
+        help="Optional flag for number of hours to limit the plot to display. Default = 0.5",
     )
 
     arg_parser.add_argument(
