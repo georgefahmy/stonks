@@ -20,6 +20,7 @@ import sys
 from argparse import ArgumentParser
 from collections import Counter
 from datetime import datetime
+from tqdm import tqdm as bar
 
 # Extended Python #
 from pathlib import Path
@@ -65,7 +66,7 @@ def get_arg_parser():
     arg_parser.add_argument(
         "-c",
         "--comments",
-        default=30,
+        default=10,
         help="Enter the limit for how many comment pages to scrape. Default=10",
         type=int,
     )
@@ -151,27 +152,30 @@ def find_stocks(wall_street_bets, parsed):
                     for ticker in ticker_list:
                         count_list.append(ticker)
                         wsb_ticker_list[ticker] = symbols[ticker]
+            try:
+                submission.comments.replace_more(limit=parsed.comments)
+                comment_stocks = []
+                filtered_comments = 0
+                for comment in submission.comments.list():
+                    logger.debug(comment.author)
+                    if comment.author == "AutoModerator":
+                        logger.debug("Skipping AutoModerator")
+                        continue
 
-            submission.comments.replace_more(limit=parsed.comments)
-            comment_stocks = []
-            filtered_comments = 0
-            for comment in submission.comments.list():
-                logger.debug(comment.author)
-                if comment.author == "AutoModerator":
-                    logger.debug("Skipping AutoModerator")
-                    continue
-
-                if comment.score > parsed.com_score:
-                    filtered_comments += 1
-                    caps_list = scrape_for_caps(comment.body)
-                    if caps_list:
-                        ticker_list = check_ticker(caps_list, ignore_list)
-                        if ticker_list:
-                            logger.debug(get_sentiment(comment.body))
-                            for ticker in ticker_list:
-                                comment_stocks.append(ticker)
-                                count_list.append(ticker)
-                                wsb_ticker_list[ticker] = symbols[ticker]
+                    if comment.score > parsed.com_score:
+                        filtered_comments += 1
+                        caps_list = scrape_for_caps(comment.body)
+                        if caps_list:
+                            ticker_list = check_ticker(caps_list, ignore_list)
+                            if ticker_list:
+                                logger.debug(get_sentiment(comment.body))
+                                for ticker in ticker_list:
+                                    comment_stocks.append(ticker)
+                                    count_list.append(ticker)
+                                    wsb_ticker_list[ticker] = symbols[ticker]
+            except Exception as e:
+                logger.error(e)
+                continue
 
             logger.info("Comments above score threshold: %d", filtered_comments)
             logger.info("Stocks found in comments: %d", len(comment_stocks))

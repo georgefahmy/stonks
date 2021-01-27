@@ -121,6 +121,10 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
+        "-i", "--ignore", nargs="*", help="List of stock symbols to ignore",
+    )
+
+    arg_parser.add_argument(
         "--debug", default=False, action="store_true", help="Displays debug messages in console",
     )
 
@@ -191,9 +195,20 @@ def main(*args):
     if parsed.no_price:
         logger.info("No-Price flag set. Price information will be turned off.")
 
+    if parsed.ignore:
+        ignore_list = sorted(DEFAULT_IGNORE_LIST)
+        logger.debug(ignore_list)
+        logger.debug(parsed.ignore)
+        ignore_list.extend(parsed.ignore)
+
+    else:
+        ignore_list = DEFAULT_IGNORE_LIST
+    logger.debug("Ignore List: %s", ignore_list)
+
     logger.info("Starting stream!")
 
     signal.alarm(30)
+
     try:
         for comment in stream:
             if comment.author in ["TickerBaby", "AutoModerator"]:
@@ -203,7 +218,7 @@ def main(*args):
             caps_list = scrape_for_caps(comment.body)
             logger.debug(caps_list)
             if caps_list:
-                ticker_list = check_ticker(caps_list, DEFAULT_IGNORE_LIST)
+                ticker_list = check_ticker(caps_list, ignore_list)
                 logger.debug(ticker_list)
                 if ticker_list:
 

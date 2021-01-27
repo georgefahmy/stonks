@@ -5,3 +5,6 @@ __pycache__
 *stock*
 keys.json
 tdameritrade/
+credentials.json
+build/
+dist/
