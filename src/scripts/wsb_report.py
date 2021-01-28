@@ -129,10 +129,10 @@ for line in [line.rstrip("\n") for line in open(TICKERS)]:
 
 def find_stocks(wall_street_bets, parsed):
     count_list = []
+    ignore_list = DEFAULT_IGNORE_LIST
     if parsed.ignore:
-        ignore_list = DEFAULT_IGNORE_LIST.extend(parsed.ignore)
-    else:
-        ignore_list = DEFAULT_IGNORE_LIST
+        ignore_list.extend(parsed.ignore)
+
     logger.debug(ignore_list)
 
     wsb_ticker_list = {}
