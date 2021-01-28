@@ -12,6 +12,7 @@ Description: Generate a report for stock mentions and the number of occurrences 
 
 
 # Base Python #
+import json
 import logging
 import os
 import re
@@ -26,7 +27,6 @@ from tqdm import tqdm as bar
 from pathlib import Path
 from praw import Reddit
 from pprint import pprint
-from utils.ignore import DEFAULT_IGNORE_LIST
 from utils.common import check_ticker, get_sentiment, scrape_for_caps
 
 # Logger
@@ -34,6 +34,7 @@ logger = logging.getLogger(__name__)
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 TICKERS = Path("tickers.txt").resolve()
+IGNORE_FILE = "src/utils/ignore.json"
 
 # Arg Parser setup #
 def get_arg_parser():
@@ -94,7 +95,7 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
-        "-i", "--ignore", nargs="*", help="List of stock symbols to ignore",
+        "-i", "--ignore", nargs="*", type=str.upper, help="List of stock symbols to ignore",
     )
 
     arg_parser.add_argument(
@@ -126,13 +127,21 @@ symbols = {}
 for line in [line.rstrip("\n") for line in open(TICKERS)]:
     symbols[line.split("|")[0]] = line.split("|")[1]
 
+with open(IGNORE_FILE, "r") as fp:
+    ignore_list_json = json.load(fp)
+
+ignore_list = list(set(ignore_list_json["DEFAULT_IGNORE_LIST"]))
+
 
 def find_stocks(wall_street_bets, parsed):
     count_list = []
+
     if parsed.ignore:
-        ignore_list = DEFAULT_IGNORE_LIST.extend(parsed.ignore)
-    else:
-        ignore_list = DEFAULT_IGNORE_LIST
+        with open(IGNORE_FILE, "w+") as fp:
+            ignore_list.extend(parsed.ignore)
+            ignore_list_json["DEFAULT_IGNORE_LIST"] = sorted(list(set(ignore_list)))
+            json.dump(ignore_list_json, fp, indent=4)
+
     logger.debug(ignore_list)
 
     wsb_ticker_list = {}
