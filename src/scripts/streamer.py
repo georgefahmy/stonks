@@ -13,6 +13,7 @@ Description: Reddit WallStreetBets stream with stock extraction from comments. I
 
 
 # Base Python #
+import json
 import logging
 import os
 import pytz
@@ -34,7 +35,6 @@ from pathlib import Path
 from praw import Reddit
 from praw.exceptions import RedditAPIException
 from better_profanity import profanity
-from utils.ignore import DEFAULT_IGNORE_LIST
 from utils.common import check_ticker, get_sentiment, scrape_for_caps
 from utils.url_shortener import make_tiny
 
@@ -44,6 +44,7 @@ logger = logging.getLogger(__name__)
 LOGGER_FORMAT = "[%(asctime)s] %(levelname)s: %(message)s"
 DATE_FORMAT = "%m/%d/%Y %H:%M:%S"
 TICKERS = Path("tickers.txt").resolve()
+IGNORE_FILE = "src/utils/ignore.json"
 
 profanity.load_censor_words()
 
@@ -121,7 +122,7 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
-        "-i", "--ignore", nargs="*", help="List of stock symbols to ignore",
+        "-i", "--ignore", nargs="*", type=str.upper, help="List of stock symbols to ignore",
     )
 
     arg_parser.add_argument(
@@ -195,14 +196,17 @@ def main(*args):
     if parsed.no_price:
         logger.info("No-Price flag set. Price information will be turned off.")
 
-    if parsed.ignore:
-        ignore_list = sorted(DEFAULT_IGNORE_LIST)
-        logger.debug(ignore_list)
-        logger.debug(parsed.ignore)
-        ignore_list.extend(parsed.ignore)
+    with open(IGNORE_FILE, "r") as fp:
+        ignore_list_json = json.load(fp)
 
-    else:
-        ignore_list = DEFAULT_IGNORE_LIST
+    ignore_list = list(set(ignore_list_json["DEFAULT_IGNORE_LIST"]))
+
+    if parsed.ignore:
+        with open(IGNORE_FILE, "w+") as fp:
+            ignore_list.extend(parsed.ignore)
+            ignore_list_json["DEFAULT_IGNORE_LIST"] = sorted(list(set(ignore_list)))
+            json.dump(ignore_list_json, fp, indent=4)
+
     logger.debug("Ignore List: %s", ignore_list)
 
     logger.info("Starting stream!")
