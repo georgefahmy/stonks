@@ -27,7 +27,6 @@ from tqdm import tqdm as bar
 from pathlib import Path
 from praw import Reddit
 from pprint import pprint
-from utils.ignore import DEFAULT_IGNORE_LIST
 from utils.common import check_ticker, get_sentiment, scrape_for_caps
 
 # Logger

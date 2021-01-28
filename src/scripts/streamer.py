@@ -35,7 +35,6 @@ from pathlib import Path
 from praw import Reddit
 from praw.exceptions import RedditAPIException
 from better_profanity import profanity
-from utils.ignore import DEFAULT_IGNORE_LIST
 from utils.common import check_ticker, get_sentiment, scrape_for_caps
 from utils.url_shortener import make_tiny
 
@@ -123,7 +122,7 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
-        "-i", "--ignore", nargs="*", help="List of stock symbols to ignore",
+        "-i", "--ignore", nargs="*", type=str.upper, help="List of stock symbols to ignore",
     )
 
     arg_parser.add_argument(
