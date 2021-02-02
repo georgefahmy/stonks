@@ -94,6 +94,7 @@ def get_arg_parser():
             "all",
         ],
         default=None,
+        type=str.lower,
         help="""Generates an instantaneous snapshot of all option positions and volumes,
         options: volume, interest (open interest), unusual (volume/open_interest),
         bidask (bid/ask spread), both (volume and open_interest),
@@ -340,6 +341,8 @@ def td_plot(symbol, target, limit, price_only, delay, hours, scatter, window_siz
 
 def main(*args):
     args = parse_args(args)
+    if args.scatter == "open_interest":
+        args.scatter = "interest"
 
     td_plot(
         args.symbol,

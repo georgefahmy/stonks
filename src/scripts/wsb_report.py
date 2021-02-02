@@ -54,10 +54,11 @@ def get_arg_parser():
     )
 
     arg_parser.add_argument(
+        "-f",
         "--type-flag",
         default="day",
-        choices=["day", "week", "month"],
-        help="enter the type of sorting for 'top': 'day, week, month'",
+        choices=["hour", "day", "week", "month"],
+        help="enter the type of sorting for 'top': 'hour, day, week, month'",
     )
 
     arg_parser.add_argument(
