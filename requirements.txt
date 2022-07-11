@@ -1,4 +1,4 @@
-praw==7.0.0
+praw==7.6.0
 robin-stocks==0.9.9.6
 textblob==0.15.3
 pytz==2019.3
